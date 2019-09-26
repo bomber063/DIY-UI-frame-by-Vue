@@ -39,6 +39,24 @@ request,然后再点击merge pull request,然后再点击confirm merge,然后del
   "author": "bomber hong",
   "license": "MIT",
 ```
+* 安装Vue，使用下面代码,
+```
+npm i --save vue 
+```
+* 从npm6开始的--save就是默认的，可以不写
+```
+npm i vue
+```
+* 由于安装Vue之后会出现node_modules文件夹，里面有大量的文件，可以选择新建一个.gitignore来设置某个路径的文件并不提交到git hub仓库。
+#### 用webstorm操作后续代码
+* webstorm的安装，见链接[JetBrains WebStorm 2019.1 x64 破解](http://www.bcniubi.cn/221)和链接[Webstorm 2019.1 破解](https://blog.csdn.net/fu983531588/article/details/89312799)
+* webstorm的汉化见链接[webStorm安装及汉化教程](https://blog.csdn.net/qq_33915006/article/details/79696319)
+* webstorm添加到鼠标右键的方法链接[WebStorm添加右键菜单](https://www.jianshu.com/p/de8f31e11dea)
+* 两个最常用的**快捷键**，
+1. shift shift，就是按两下shift，它会给你一个搜索框，可以搜索其他任意的快捷键,比如可以搜VCS，它的全称是version control system,版本控制系统，就是用于git操作的。搜索vcs后可以看到一个vcs Operations Popup，它可以用于与git操作
+2. 搜索vcs后可以看到一个vcs Operations Popup，你可以看到它的快捷键，我的快捷键是alt+`，每个人这个的快捷键不一定相同。
+3. 设置（ctrl+alt+s），它在文件——>设置里面，然后就可以看到所有的快捷键，而且可以修改他们
+4. 格式化代码（ctrl+alt+L）
 ## 其他说明
 * 一个Vue的UI组件。
 作者：bomber

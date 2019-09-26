@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/bomber063/DIY-UI-frame-by-Vue/issues"
   },
-  "homepage": "https://github.com/bomber063/DIY-UI-frame-by-Vue#readme"
+  "homepage": "https://github.com/bomber063/DIY-UI-frame-by-Vue#readme",
+  "dependencies": {
+    "vue": "^2.6.10"
+  }
 }
