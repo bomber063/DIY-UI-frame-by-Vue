@@ -1,0 +1,22 @@
+{
+  "name": "gulu-demo",
+  "version": "1.0.0",
+  "description": "这个是一个UI框架",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bomber063/DIY-UI-frame-by-Vue.git"
+  },
+  "keywords": [
+    "Vue，ui"
+  ],
+  "author": "bomber hong",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bomber063/DIY-UI-frame-by-Vue/issues"
+  },
+  "homepage": "https://github.com/bomber063/DIY-UI-frame-by-Vue#readme"
+}
