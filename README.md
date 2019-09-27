@@ -152,6 +152,17 @@ Vue.component('g-button', {
         }
 ```
 * 这里WebStorm会认为g-button这个选择器没有使用过，因为我们是在另外一个JS文件里面使用的，所以这个软件查询不到，这个可以忽略。
+### 代码组合到一个文件里面
+* 目前的代码是分散的，比如
+1. JS是写在单独的button.js文件里面。
+2. HTML是写在button.js的template里面。
+3. 样式写到index.html的style标签里面。
+* Vue是可以使用[单文件组件的](https://cn.vuejs.org/v2/guide/single-file-components.html#ad)，也就是**可以用一个文件表示这三种语言，但是需要先引入webpack或者[parcel](https://parceljs.org/)**，目前先用parcel。
+* 根据[parcel开始](https://zh.parceljs.org/getting_started.html)里面的安装进行安装
+* 前面的Vue的安装是给用户使用的，所以不需要加-D，因为**-D是给开发者使用的,D的意思就是development**，具体见这个链接[npm install -S -D -g 有什么区别](https://www.jianshu.com/p/2e7f3b69e51e)
+```
+npm i -D parcel-bundler
+```
 ## 其他说明
 * 一个Vue的UI组件。
 * 使用本框架前，请在CSS中开启下面代码
