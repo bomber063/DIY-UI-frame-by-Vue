@@ -326,6 +326,31 @@ git open
     <g-button>按钮</g-button>
 </div>
 ```
+## 增加Icon
+* Icon一般需要设计师来做的比较漂亮，所以前端一般是弄不出来的，这里可以推荐一个[icon网站](https://www.iconfont.cn/)
+* 这里不详细说明过程了，详细可以查看以前的博客——[小图标创建](https://zhuanlan.zhihu.com/p/54616676)和[帮助](https://www.iconfont.cn/help/detail?spm=a313x.7781069.1998910419.d8d11a391&helptype=code)
+* 这里说明一点就是如果有上下左右这种结构的，可能不一定会有左右或者上下匹配的图标，那么就通过
+1. **编辑图标去设置上下或者左右旋转**就好了。
+2. 也可以直接下载SVG图片使用墨刀（window）或者Sketch(苹果)可以编辑SVG的软件，也有在线的软件，来更改方向，改变之后上传SVG（这里必须上传SVG格式才行）到icon网站对应你的项目即可。
+* 更多[SVG编辑工具](https://www.mockplus.cn/blog/post/1308)，其中一款工具[AICC2019下载Adobe Illustrator CC 2019中文完整破解版免费下载与安装教程](https://www.jianshu.com/p/5e226def99cd)
+* 这个Icon标签的宽高和字体一样就可以，设置为1em。代码修改为。
+```
+    <g-button>
+        <svg class="icon" aria-hidden="true">
+            <use xlink:href="#i-setting"></use>
+        </svg>
+        按钮
+    </g-button>
+```
+* CSS代码为
+```
+.icon{
+            width: 1em; height: 1em;
+            vertical-align: -0.15em;
+        }
+```
+* 为了便于使用该库的人更好的使用，一般是把SVG不写到index文件里面，而是写到button.vue里面，并且把CSS的样式解决好。
+
 ## 其他说明
 * 一个Vue的UI组件。
 * 使用本框架前，请在CSS中开启下面代码
