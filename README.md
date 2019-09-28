@@ -1,4 +1,21 @@
 # DIY-UI-frame-by-Vue
+## 大致的知识点
+1. parcel
+2. scss
+3. Vue 单文件组件
+4. WebStorm 的快捷键
+5. CSS变量和:root选择器
+6. Vue.component
+7. 插槽（slot）
+8. $emit
+9. props
+10. Headless Chrome
+11. Mock
+12. npm scripts
+* 不要妄图掌握所有的知识点，针对不同知识点不同的掌握程度：
+1. 工具知识点——webpack，parcel,less,sass,babel等，这些工具很容易被取代，有的可能一年左右就被取代了。这种只需要知道怎么用即可。
+2. 语言特性知识点——比如JS的promise，async，Vue框架特性，CSS变量及:root选择器等，有些暂时没有用到，不是在这一节中有太多体现。这些**必须要深入了解**。
+3. 抽象特点知识点——比如代码如何组织，写代码的流程，写之前需要思考或者做什么，设计模式等。
 ## 需求分析
 * 用例图
 1. 点击按钮——它包括loading状态，
@@ -49,18 +66,19 @@ npm i vue
 ```
 * 由于安装Vue之后会出现node_modules文件夹，里面有大量的文件，可以选择新建一个.gitignore来设置某个路径的文件并不提交到git hub仓库。
 #### 用webstorm操作后续代码
-* webstorm的安装，见链接[JetBrains WebStorm 2019.1 x64 破解](http://www.bcniubi.cn/221)和链接[Webstorm 2019.1 破解](https://blog.csdn.net/fu983531588/article/details/89312799)
-* webstorm的汉化见链接[webStorm安装及汉化教程](https://blog.csdn.net/qq_33915006/article/details/79696319)
-* webstorm添加到鼠标右键的方法链接[WebStorm添加右键菜单](https://www.jianshu.com/p/de8f31e11dea)
-* webstorm修改字体方法链接[WebStorm设置编辑器中的字体大小及样式](https://www.cnblogs.com/dzlishen/p/4253280.html)
+* WebStorm的安装，见链接[JetBrains WebStorm 2019.1 x64 破解](http://www.bcniubi.cn/221)和链接[Webstorm 2019.1 破解](https://blog.csdn.net/fu983531588/article/details/89312799)
+* WebStorm的汉化见链接[webStorm安装及汉化教程](https://blog.csdn.net/qq_33915006/article/details/79696319)
+* WebStorm添加到鼠标右键的方法链接[WebStorm添加右键菜单](https://www.jianshu.com/p/de8f31e11dea)
+* WebStorm修改字体方法链接[WebStorm设置编辑器中的字体大小及样式](https://www.cnblogs.com/dzlishen/p/4253280.html)
 * 添加一个设置，调试器（Debugger）里面把允许未签名（Allow unsigned requests）的选项打钩，具体为什么暂时不清楚，我自己搜索了一下，可能是这个而连接[webstorm打开的页面如何通过手机访问？](https://blog.csdn.net/qq_28296925/article/details/94602731)
 * 添加一个设置，在系统设置（system settings）取消勾选关闭 WebStorm 的 Safe Write 功能，也就是Use'safe write'(save changes to a temporary file first)这个选项去掉打钩。可能的原因是[webstorm不能自动重新编译问题](https://blog.csdn.net/qq_34149935/article/details/79224263)
-* 视频中的额webstorm只支持ES5的写法，可能是老版本的，有些ES6的写法会出现警告或者下划线，不过可以点击红灯泡来解决。不过现在都支持了。
-* 两个最常用的**快捷键**，
+* 视频中的额WebStorm只支持ES5的写法，可能是老版本的，有些ES6的写法会出现警告或者下划线，不过可以点击红灯泡来解决。不过现在都支持了。
+* 两个最常用的**快捷键**:
 1. shift shift，就是按两下shift，它会给你一个搜索框，可以搜索其他任意的快捷键,比如可以搜VCS，它的全称是version control system,版本控制系统，就是用于git操作的。搜索vcs后可以看到一个vcs Operations Popup，它可以用于与git操作，所以webstorm可以代替git bash这个软件。当然有时候会git操作失败，失败就继续用git bash吧。
 2. 搜索vcs后可以看到一个vcs Operations Popup，你可以看到它的快捷键，我的快捷键是alt+`，每个人这个的快捷键不一定相同。
 3. 设置（ctrl+alt+s），它在文件——>设置里面，然后就可以看到所有的快捷键，而且可以修改他们
 4. 格式化代码（ctrl+alt+L）
+* 在WebStorm中输入Button.log就会自动转换为console.log(Button);
 ## 代码创建一个按钮
 ### 一个WebStorm的警告，不知道为什么
 * 我的WebStorm版本是2019.1
@@ -285,7 +303,29 @@ git open
 7. 通过开发者工具打开http://localhost:1234可以看到渲染后JS自动变成了script标签去引用，CSS自动变成了link去引用。
 * 这些就是[单文件组件](https://cn.vuejs.org/v2/guide/single-file-components.html#ad)，特点就是把html,JS,css放到一个文件里面。
 * 目前用到的parcel暂时不用配置，比较方便。但是后续需要一些操作。
+* 目前学完了前面六个知识点：
+1. parcel
+2. scss
+3. Vue 单文件组件
+4. WebStorm 的快捷键
+5. CSS变量和:root选择器
+6. Vue.component
 ***
+## Vue的slot插槽
+* 单文件组件（button.vue）的template代码中的内容不知道是什么，需要外面（index.html）传进来,这时候就用到[slot](https://cn.vuejs.org/v2/api/#slot)和[slot详细](https://cn.vuejs.org/v2/guide/components-slots.html)，当index.html用到这个创建的标签g-button的时候，这个标签里面传入什么信息就会被button.vue的slot替换为什么信息。
+```
+<template>
+    <button class="g-button">
+        <slot></slot>
+    </button>
+</template>
+```
+* 我在index.html中传入按钮两个字
+```
+<div id="app">
+    <g-button>按钮</g-button>
+</div>
+```
 ## 其他说明
 * 一个Vue的UI组件。
 * 使用本框架前，请在CSS中开启下面代码
