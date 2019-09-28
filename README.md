@@ -116,6 +116,8 @@ Vue.component('g-button', {
 * 这里用到CSS的伪类,[:root](https://developer.mozilla.org/zh-CN/docs/Web/CSS/:root)这个 CSS 伪类匹配文档树的根元素。对于 HTML 来说，:root 表示 <html> 元素，除了优先级更高之外，与 html 选择器相同。
 * 在声明全局 [CSS 变量](https://developer.mozilla.org/zh-CN/docs/Web/CSS/--*)时 :root 会很有用,带有前缀--的属性名，比如--example--name，表示的是带有值的自定义属性，其可以通过 var 函数在全文档范围内复用的。
 * [:active](https://developer.mozilla.org/zh-CN/docs/Web/CSS/:active) CSS伪类匹配被用户激活的元素。它让页面能在浏览器监测到激活时给出反馈。当用鼠标交互时，它代表的是用户按下按键和松开按键之间的时间
+* :root的兼容性说明请查看[canIUse网站](https://www.caniuse.com/)
+* 这个:root其实就是html选择器。改成html是一样的。
 ```
         :root{
             --button-height:32px;
@@ -163,6 +165,127 @@ Vue.component('g-button', {
 ```
 npm i -D parcel-bundler
 ```
+* 创建一个src文件夹。然后把index.html里面的下面的Vue代码拷贝到这个文件里面的app.js里面去。
+```
+new Vue({
+    el: '#app',
+})
+```
+* 在index.html中引入vue的和引入button.js的script代码也可以删除，从app.js里面import来引入
+* 删除index.html中的下面行代码
+```
+<script src="./node_modules/vue/dist/vue.min.js"></script>
+<script src="./button.js"></script>
+```
+* 但是需要引入app.js这个文件，因为所有的**入口全都从这个app.js进入**
+```
+<script src="./src/app.js"></script>
+```
+* 这个app.js需要加入vue的引入，通过下面代码
+```
+import Vue from 'vue'
+```
+* 它的完整写法是把整个目录写进入，但是import...from...的from命令后面可以跟很多路径格式，若只给出vue，axios这样的包名，则会自动到node_modules中加载；若给出相对路径及文件前缀，则到指定位置寻找。所以可以忽略掉路径，详细省略路径的原因见[链接import Vue from 'vue'](https://blog.csdn.net/bujiongdan/article/details/81416100)，完整的写法
+```
+import Vue from "../node_modules/vue/dist/vue.js";
+```
+* 可以看到之前的入口由script里面的src引入，现在通过import引入。
+* 在src里面在创建一个**button.vue，包括了html（用template标签），css（用style标签），js（用script标签）的三个代码，**把前面的代码拷贝过来**稍作修改即可**。
+* script里面只需要用`export default {}`,style中使用SCSS代码稍微修改下，[这里的`&`是SCSS的语法](https://www.html.cn/doc/sass/#parent-selector),它代表引用父选择器。
+* 此时的button.js可以删除掉了
+* button.vue此时的代码
+```
+<template>
+    <button class="g-button">按钮</button>
+</template>
+<script>
+    export default {
+
+    }
+</script>
+<style lang="scss">
+    .g-button{
+        font-size: var(--font-size);
+        height:var(--button-height);
+        padding: 0 1em;
+        border-radius:var(--border-radius);
+        border:1px solid var(--border-color);
+        background: var(--button-bg);
+        &:hover{
+            border-color: var(--border-color-hover);
+        }
+        &:active{
+            background: var(--button-active-bg);
+        }
+        &:focus{
+            outline: none;//这里是不显示默认蓝色的边框，后续在加focus的样式
+        }
+    }
+</style>
+```
+* 这里用到全局注册的组件[Vue.component](https://cn.vuejs.org/v2/api/#Vue-component)，整个app.js代码修改为
+```
+import Vue from 'vue'
+import Button from './button'
+
+Vue.component('g-button',Button)
+
+new Vue({
+    el: '#app',
+})
+```
+* 最后我们需要运行parcel打包代码运行后才可以生效。**需要写入完整路径,window用户还需要在后面加上index.html，不然可能会有No entres found 报错**。
+```
+./node_modules/.bin/parcel index.html
+```
+* 如果**你不想写入全部路径可以用npx，它可以帮助你找被目录的路径**
+```
+npx parcel index.html
+```
+* parcel会去安装你需要的所有东西(包括vue-template-compiler@2.6.10，@vue/component-compiler-utils@3.0.0，sass@1.22.12，vue-hot-reload-api@2.3.4)，安装完后会有一个链接地址http://localhost:1234/给你就可以在浏览器上查看啦。
+### 但是此时运行parcel出现了错误
+* 浏览器上报错显示vue.runtime.esm.js:734 [Vue warn]: You are using the **runtime-only build of Vue** where the template compiler is not available. Either pre-compile the templates into render functions, or use the compiler-included build.
+* 这里说到runtime-only有问题，此时我们通过[Vue文档](https://cn.vuejs.org/v2/guide/installation.html#Parcel)查看配置parcel需要添加东西，package.json加入下面代码
+```
+{
+  // ...
+  "alias": {
+    "vue" : "./node_modules/vue/dist/vue.common.js"
+  }
+}
+```
+* 修改后就不会去使用默认的runtime-only版本，而是去使用vue.common.js版本。
+* 此时ctrl+c断开后使用下面代码运行，**此时需要加上--no-cache,意思是不要使用之前的缓存**
+```
+npx parcel index.html --no-cache
+```
+* 因为安装了parcel运行后会有一个.cache文件，如果把这个文件删除掉也可以不加--no-cache。
+* 此时就可以在出现的链接http://localhost:1234中看到按钮啦。
+* 此时产生的.cache文件（parcel编译的过程中产生的缓存存放的地方）不需要上传到git hub上面去，要放到.gitignore里面去。
+* dist文件夹也暂时不用上传，放到.gitignore里面去。
+### 其他
+* 安装一个git open就可以在所在目录用git直接打开git hub仓库的网页了。这个可以全局安装
+```
+npm i -g git-open
+```
+* 然后再任何一个git仓库的目录输入下面代码就可以打开远程git hub仓库了
+```
+git open
+```
+* 不过只是用默认的浏览器打开，指定用某个浏览器我还不会用。具体见[链接git-open](https://github.com/paulirish/git-open)
+### 小结
+***
+* 目前我们就把代码从最原始的JS版本变成parcel版本，我们大致做了以下内容：
+1. 首先把button.js变成了button.vue。button.vue里面有html内容，JS内容和内容CSS。
+2. 在app.js里面把所有的依赖（引入两个script标签）通过import来代替，比如Vue库和button.vue的引入。
+3. app.js里面通过Vue.component声明g-button标签对应Button.vue这个引入
+4. 然后在app.js里面用new Vue实例化（初始化）标签为#app的这个DIV。
+5. index.html里面有一个标签为#app的这个DIV，它里面有一个g-button这个标签，它会去问Vue是否认识这个按钮，因为通过了Vue.component声明过了。他会把这个g-button的按钮渲染成Button.vue
+6. 然后就进入到Button.vue这个文件里面看template里面的html,JS和CSS一起来渲染。
+7. 通过开发者工具打开http://localhost:1234可以看到渲染后JS自动变成了script标签去引用，CSS自动变成了link去引用。
+* 这些就是[单文件组件](https://cn.vuejs.org/v2/guide/single-file-components.html#ad)，特点就是把html,JS,css放到一个文件里面。
+* 目前用到的parcel暂时不用配置，比较方便。但是后续需要一些操作。
+***
 ## 其他说明
 * 一个Vue的UI组件。
 * 使用本框架前，请在CSS中开启下面代码
