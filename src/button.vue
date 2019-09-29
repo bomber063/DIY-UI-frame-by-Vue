@@ -1,15 +1,24 @@
 <template>
-    <button class="g-button">
-        <slot></slot>
-    </button>
+        <button class="g-button" v-bind:class="{[`icon-${iconPosition}`]:true}">
+            <svg v-if="icon" class="icon"  aria-hidden="true">
+                <use :xlink:href="`#i-${icon}`"></use>
+            </svg>
+            <div class="content">
+                <slot ></slot>
+            </div>
+        </button>
 </template>
 <script>
     export default {
-
+        props:['icon','icon-position']
     }
 </script>
 <style lang="scss">
     .g-button{
+        vertical-align: top;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         font-size: var(--font-size);
         height:var(--button-height);
         padding: 0 1em;
@@ -28,8 +37,23 @@
         & .icon{
             width: 1em; height: 1em;
             vertical-align: -0.15em;
+            order:1;
+            margin-right:.1em;
             /*fill: currentColor;*/
             /*overflow: hidden;*/
+        }
+        & .content{
+            order:2;
+        }
+        &.icon-right{
+            & .icon{
+                order:2;
+                margin-left:.1em;
+                margin-right:0;
+            }
+            & .content{
+                order:1;
+            }
         }
     }
 

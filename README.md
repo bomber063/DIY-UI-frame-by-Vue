@@ -79,6 +79,7 @@ npm i vue
 3. 设置（ctrl+alt+s），它在文件——>设置里面，然后就可以看到所有的快捷键，而且可以修改他们
 4. 格式化代码（ctrl+alt+L）
 * 在WebStorm中输入Button.log就会自动转换为console.log(Button);
+* 用emmet简化CSS写法可以搜索把emmet里面CSS的Enable fuzzy search among CSS abbreviations打钩
 ## 代码创建一个按钮
 ### 一个WebStorm的警告，不知道为什么
 * 我的WebStorm版本是2019.1
@@ -212,6 +213,7 @@ import Vue from "../node_modules/vue/dist/vue.js";
 * script里面只需要用`export default {}`,style中使用SCSS代码稍微修改下，[这里的`&`是SCSS的语法](https://www.html.cn/doc/sass/#parent-selector),它代表引用父选择器。
 * 此时的button.js可以删除掉了
 * button.vue此时的代码
+* 这里用到了style的[lang属性](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Global_attributes/lang)
 ```
 <template>
     <button class="g-button">按钮</button>
@@ -350,7 +352,197 @@ git open
         }
 ```
 * 为了便于使用该库的人更好的使用，一般是把SVG不写到index文件里面，而是写到button.vue里面，并且把CSS的样式解决好。
+### 用props传值
+* 我们用到[Vue的props](https://cn.vuejs.org/v2/api/#props),props 可以是数组或对象，用于接收来**自父组件的数据**。props 可以是简单的数组，或者使用对象作为替代，对象允许配置高级选项，如类型检测、自定义验证和设置默认值。
+* 我们在button.vue里面写入
+```
+<script>
+    export default {
+        props:['icon']
+    }
+</script>
+```
+* **这里的icon是一个标签的属性，并且是一个变量，这里的icon值是父级组件标签的属性传过来的**，也就是index.html的标签g-button的属性传过来的。我们传入icon为setting
+```
+<div id="app">
+    <g-button icon="setting">
+        按钮
+    </g-button>
+</div>
+```
+* 这里的**export对应该文件路径的import**。在import下面输入console.log(icon)可以打出这个icon的值，也就是也就是index.html的标签g-button的属性传过来的值。
+* button.vue上面用到export
+```
+    export default {
+        props:['icon']
+    }
+```
+* app.js里面用到import
+```
+import Button from './button'
+```
+* [传递动态prop](https://cn.vuejs.org/v2/guide/components-props.html#%E4%BC%A0%E9%80%92%E9%9D%99%E6%80%81%E6%88%96%E5%8A%A8%E6%80%81-Prop)，这里需要用到v-bind:绑定属性，也可以简写为一个冒号:,这里还用到ES的反引号和插入${}的[模板字符串](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/template_strings)用法，也就是把它变成了一个JS语法的操作。
+```
+        <svg class="icon" aria-hidden="true">
+            <use :xlink:href="`#i-${icon}`"></use>
+        </svg>
+```
+* export和import的用法[说明](https://www.cnblogs.com/xiaotanke/p/7448383.html)
+### 一个BUG
+* 如果用户没有传入icon，也就是index.html里面的 g-button没有写icon，那么就会出现一个空的SVG占用位置。
+* 只需要加一个v-if及可，就是icon变量存在的时候才会出现SVG，不存在就不出现SVG
+```
+        <svg v-if="icon" class="icon" aria-hidden="true">
+            <use :xlink:href="`#i-${icon}`"></use>
+        </svg>
+```
+### icon从左边换到右边
+* 这里要增加一个变量icon-position（短横线法）或者iconPostion（驼峰法）,**这个变量在HTML只能用中划线与他们对应，**HTML中的特性名是大小写不敏感的**，所以浏览器会把所有大写字符解释为小写字符。这意味着当你使用 DOM 中的模板时，camelCase (驼峰命名法) 的 prop 名需要使用其等价的 kebab-case (短横线分隔命名) 命名，具体说明详细见[Prop 的大小写 (camelCase vs kebab-case)](https://cn.vuejs.org/v2/guide/components-props.html#Prop-%E7%9A%84%E5%A4%A7%E5%B0%8F%E5%86%99-camelCase-vs-kebab-case)
+* 但是**在v-bind绑定的style里面就必须要写驼峰**，不管props里面是icon-position（短横线法）还是iconPosition（驼峰法）
+```
+v-bind:style="{order:iconPosition}"
+```
+* 介绍两种方法：
+1. 用v-if,[v-else](https://cn.vuejs.org/v2/api/#v-else)来判断之后把slot的顺序修改，但是这样写重复代码有点多，重复多了就会不小心犯错。比如
+```
+        <button class="g-button" v-if="iconPosition==='right'">
+            <slot></slot>
+            <svg v-if="icon" class="icon"  aria-hidden="true">
+                <use :xlink:href="`#i-${icon}`"></use>
+            </svg>
+        </button>
+        <button class="g-button" v-else>
+            <svg v-if="icon" class="icon"  aria-hidden="true">
+                <use :xlink:href="`#i-${icon}`"></use>
+            </svg>
+            <slot></slot>
+        </button>
+```
+2. 用 v-bind:class,用CSS来控制前后顺序，不用JS控制前后顺序，这样用CSS来做样式相关的代码，可以减少代码重复导致不小心的犯错,这里用到了[用方括号括起来的 JavaScript 表达式作为一个指令的参数](https://cn.vuejs.org/v2/guide/syntax.html#%E5%8A%A8%E6%80%81%E5%8F%82%E6%95%B0),比如下面的代码，这里的${iconPosition}首先会被props里面的icon-position替换，prop这里的icon-position是index中赋值的right，所以${iconPosition}最后就是right，所以就变成`{[`icon-right`]:true}`,
+icon-right会被作为一个 JavaScript 表达式进行动态求值，求得的值将会作为最终的参数来使用。那么这个绑定将等价于 v-bind:class={icon-right:true}。**这个 class 存在与否将取决于数据属性 icon-right 的 truthiness,默认是false，**也就是默认不绑定icon-right这个class,但是如果是true那么就会绑定icon-right这个class。具体见[对象语法](https://cn.vuejs.org/v2/guide/class-and-style.html#%E5%AF%B9%E8%B1%A1%E8%AF%AD%E6%B3%95)
+```
+            <svg v-if="icon" class="icon" v-bind:class="{[`icon-${iconPosition}`]:true}" aria-hidden="true">
+                <use :xlink:href="`#i-${icon}`"></use>
+            </svg>
+```
+* script中有props
+```
+<script>
+    export default {
+        props:['icon','icon-position']
+    }
+</script>
+```
+* 外面的index.html中的icon-position做了赋值
+```
+<div id="app">
+    <g-button icon="setting" icon-position="right">
+        按钮
+    </g-button>
+    <g-button icon="setting">
+        按钮
+    </g-button>
+</div>
+```
+* CSS 的选择器默认的order为0，icon-right的order为1，也就是在默认的右边。
+```
+        & .icon{
+            width: 1em; height: 1em;
+            vertical-align: -0.15em;
+            order:0;
+            /*fill: currentColor;*/
+            /*overflow: hidden;*/
+        }
+        & .icon-right{
+            order:1;
+        }
+    }
+```
+3. 也可以把v-bind:class绑定到SVG的上一级div上面。不过这里需要注意slot是不能绑定class的也就是slot标签不能有属性class，因为它会消失，具体为什么暂时不清楚，所以需要给slot外面加一个div并且绑定一个默认的class。
+* 外面的index.html代码也有icon-position="right"
+```
+    <g-button icon="setting" icon-position="right">
+        按钮
+    </g-button>
+```
+* template代码为
+```
+        <button class="g-button" v-bind:class="{[`icon-${iconPosition}`]:true}">
+            <svg v-if="icon" class="icon"  aria-hidden="true">
+                <use :xlink:href="`#i-${icon}`"></use>
+            </svg>
+            <div class="content">
+                <slot ></slot>
+            </div>
+        </button>
+```
+* script一样
+```
+    export default {
+        props:['icon','icon-position']
+    }
+```
+* CSS代码需要有默认的顺序（icon在前面，content在后面）和icon-right的样式顺序（icon在后面，content在前面）
+```
+        & .icon{
+            width: 1em; height: 1em;
+            vertical-align: -0.15em;
+            order:1;
+            /*fill: currentColor;*/
+            /*overflow: hidden;*/
+        }
+        & .content{
+            order:2;
+        }
+        &.icon-right{
+            & .icon{
+                order:2;
+            }
+            & .content{
+                order:1;
+            }
+        }
+```
+* 当然也可以直接用v-bind:style，v-bind:style 的对象语法十分直观——看着非常像 CSS，但**其实是一个 JavaScript 对象**。CSS 属性名可以用驼峰式 (camelCase) 或短横线分隔 (kebab-case，记得用引号括起来) 来命名
+### 解决一个CSS不对齐BUG
+* 发现两个按钮上下之间没有对齐，这是**因为inline元素引起的BUG**，这时候只需要在对应的class上面加上下面属性和值（这个值除了默认值都可以，比如top,middle等）即可：
+```
+    .g-button{
+        vertical-align: top;
+        }
+```
+### 继续增加icon和字体之间的CSS间隙样式
+* 只需要icon和字体之间间隙为0.3em即可，因为默认样式会增加到所有样式中，包括icon-right样式里面去，所需要在icon-right里面写上margin-right:0
+```
+        & .icon{
+            margin-right:.1em;
+        }
+        & .content{
+            order:2;
+        }
+        &.icon-right{
+            & .icon{
+                order:2;
+                margin-left:.1em;
+                margin-right:0;
+            }
+            & .content{
+                order:1;
+            }
+```
+### 小结
+***
+* 我们是怎么引入这个icon到从左边到右边的
+1. 在index.html上增加一个icon-position，如果它赋值为right就是右边。如果没有写这个icon-position那就就出现在最左边。
+2. 这个class是如何控制的，是通过这个代码,它通过**方括号和字符串模板的插入${}，并且通过绑定class的对象语法完成**。
+3. 绑定class之后，通过对应Class控制CSS的order就可以间接控制顺序了。
+```
+v-bind:class="{[`icon-${iconPosition}`]:true}"
+```
+***
 
+
+* * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
 ## 其他说明
 * 一个Vue的UI组件。
 * 使用本框架前，请在CSS中开启下面代码

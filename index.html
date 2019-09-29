@@ -8,8 +8,8 @@
     <style>
         *{
             box-sizing: border-box;
-            padding: 0px;
-            margin: 0px;
+            padding: 0;
+            margin: 0;
         }
         :root{
             --button-height:32px;
@@ -33,9 +33,12 @@
 <body>
 <div id="app">
     <g-button>
-        <svg class="icon" aria-hidden="true">
-            <use xlink:href="#i-setting"></use>
-        </svg>
+        按钮
+    </g-button>
+    <g-button icon="setting" icon-position="right">
+        按钮
+    </g-button>
+    <g-button icon="setting">
         按钮
     </g-button>
 </div>
