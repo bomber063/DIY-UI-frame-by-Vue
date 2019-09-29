@@ -530,6 +530,47 @@ icon-right会被作为一个 JavaScript 表达式进行动态求值，求得的�
                 order:1;
             }
 ```
+### props的另一种写法，不用数组，用对象
+* [props](https://cn.vuejs.org/v2/api/#props)用数组是简单语法，对象语法稍微复杂一点,因为它可以提供验证。并且提供了一些选项：
+1. type: 可以是下列原生构造函数中的一种：String、Number、Boolean、Array、Object、Date、Function、Symbol,任何自定义构造函数、或上述内容组成的数组。会检查一个 prop 是否是给定的类型，否则抛出警告。
+2. default: any，为该 prop 指定一个默认值。如果该 prop 没有被传入，则换做用这个值。
+3. required: Boolean，定义该 prop 是否是必填项。在非生产环境中，如果这个值为 truthy 且该 prop 没有被传入的，则一个控制台警告将会被抛出。
+4. validator: Function，自定义验证函数会将该 prop 的值作为唯一的参数代入。在非生产环境下，如果该函数返回一个 falsy 的值 (也就是验证失败)，一个控制台警告将会被抛出。
+* 我们可以通过validator函数打出传进来的参数是什么，比如
+```
+                validator(xxx) {
+                    console.log(xxx)
+                }
+```
+* 为了防止用户输入除了左left右right以外别的方向，我们可以通过下面的验证函数.
+```
+                validator(xxx) {
+                    if(xxx!=='left'&&xxx!=='right'){
+                    return false
+                    }
+                    return true
+                }
+```
+* 当用户输入除了left和right以外的值浏览器就会报错,报错示例.
+```
+vue.common.dev.js:750 [Vue warn]: Invalid prop: custom validator check failed for prop "iconPosition".
+
+found in
+
+---> <GButton>
+       <Root>
+```
+* 上面的validator代码如果是使用WebStorm编辑器那么就可以看到有黄色小灯泡，里面有一堆优化代码的选项，有很多可以简化的选项，这里选择其中一种，比如可以选择simplify if-else就变成了
+```
+                validator(xxx) {
+                    return !(xxx !== 'left' && xxx !== 'right');
+                }
+```
+* 还可以继续优化，把&&改成||
+```
+                    return xxx === 'left' || xxx === 'right';
+```
+* 我们定义type类型为字符串，并且default默认值为'left',然后只能输入的参数只能使left和right.
 ### 小结
 ***
 * 我们是怎么引入这个icon到从左边到右边的
