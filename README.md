@@ -620,7 +620,10 @@ Vue.component('g-icon',Icon)
             <g-icon v-if="icon" :name="icon"></g-icon>
 ```
 * 这时候你就可以在index.html或button.vue中都可以使用g-icon标签了。
-
+* 但是还有一个icon的class样式没有加入，我们把代码加入这个class它主要是控制顺序，也就是order，还有一些margin。
+```
+            <g-icon class="icon" v-if="icon" :name="icon"></g-icon>
+```
 
 * * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
 ## 其他说明
