@@ -3,6 +3,7 @@
 <!--            <svg v-if="icon" class="icon" >-->
 <!--                <use :xlink:href="`#i-${icon}`"></use>-->
 <!--            </svg>-->
+            <g-icon name="loading" class="loading-css"></g-icon>
             <g-icon class="icon" v-if="icon" :name="icon"></g-icon>
             <div class="content">
                 <slot></slot>
@@ -63,6 +64,17 @@
             & .content{
                 order:1;
             }
+        }
+        & .loading-css{
+            animation: rotate 1.5s linear infinite;
+        }
+    }
+    @keyframes rotate {
+        from{
+            transform: rotate(0deg);
+        }
+        to{
+            transform:rotate(360deg);
         }
     }
 </style>

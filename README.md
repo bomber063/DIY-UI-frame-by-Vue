@@ -624,7 +624,26 @@ Vue.component('g-icon',Icon)
 ```
             <g-icon class="icon" v-if="icon" :name="icon"></g-icon>
 ```
-
+## 增加loading icon
+* 继续在iconfont网站找一个加载的图标。
+* 然后增加一个loading-css的class
+```
+            <g-icon name="loading" class="loading-css"></g-icon>
+```
+* 然后在button.vue上添加一个旋转的动画
+```
+    @keyframes rotate {
+        from{
+            transform: rotate(0deg);
+        }
+        to{
+            transform:rotate(360deg);
+        }
+        
+        & .loading-css{
+            animation: rotate 1.5s linear infinite;
+        }
+```
 * * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
 ## 其他说明
 * 一个Vue的UI组件。
