@@ -1,10 +1,11 @@
 <template>
         <button class="g-button" v-bind:class="{[`icon-${iconPosition}`]:true}">
-            <svg v-if="icon" class="icon"  aria-hidden="true">
-                <use :xlink:href="`#i-${icon}`"></use>
-            </svg>
+<!--            <svg v-if="icon" class="icon" >-->
+<!--                <use :xlink:href="`#i-${icon}`"></use>-->
+<!--            </svg>-->
+            <g-icon v-if="icon" :name="icon"></g-icon>
             <div class="content">
-                <slot ></slot>
+                <slot></slot>
             </div>
         </button>
 </template>
@@ -45,8 +46,6 @@
             outline: none;//这里是不显示默认蓝色的边框，后续在加focus的样式
         }
         & .icon{
-            width: 1em; height: 1em;
-            vertical-align: -0.15em;
             order:1;
             margin-right:.1em;
             /*fill: currentColor;*/
@@ -66,5 +65,4 @@
             }
         }
     }
-
 </style>

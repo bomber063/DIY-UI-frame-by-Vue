@@ -581,6 +581,45 @@ found in
 v-bind:class="{[`icon-${iconPosition}`]:true}"
 ```
 ***
+## 增加icon.vue，将svg代码组件化整理到icon.vue
+* 如果需要新增加icon，那么需要重新写以前的重复代码，如何解决呢？增加icon.vue是可以减少更多的重复代码
+* 建立一个icon.vue代码为：
+```
+<template>
+        <svg class="g-icon">
+            <use :xlink:href="`#i-${name}`"></use>
+        </svg>
+</template>
+<script>
+    export default {
+        props:['name']
+    }
+</script>
+<style lang="scss">
+    .g-icon {
+        vertical-align: -0.15em;
+        width: 1em;
+        height: 1em;
+    }
+</style>
+```
+* app.js里面引入全局组件icon.vue
+```
+import Icon from './icon'
+
+Vue.component('g-icon',Icon)
+```
+* button.vue的下面代码就可以删除
+```
+            <svg v-if="icon" class="icon" >
+                <use :xlink:href="`#i-${icon}`"></use>
+            </svg>
+```
+* 替换为下面的代码，注意name前面需要有一个冒号:。这个冒号是v-bind:的缩写，如果不写这个冒号icon就是一个字符串，写了这个icon是一个变量，也就是props里面的变量icon。可以用外部对这个icon属性进行赋值操作。
+```
+            <g-icon v-if="icon" :name="icon"></g-icon>
+```
+* 这时候你就可以在index.html或button.vue中都可以使用g-icon标签了。
 
 
 * * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
