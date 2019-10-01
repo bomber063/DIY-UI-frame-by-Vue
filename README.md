@@ -656,11 +656,11 @@ fill:red
               default: false
             },
 ```
-* 当属性后面的值要表示变量的时候，属性前面必须要有冒号：或者v-bind:，因为这样的属性值这样才能使JS的代码，比如下面的就是字符串"true"
+* 当属性后面的值要表示变量的时候，属性前面必须要有冒号：或者v-bind:，因为这样的属性值这样才能使它成为JS的代码，比如下面的就是字符串"true"
 ```
     <g-button loading="true">
 ```
-* 下面的就是JS代码对应的布尔true，此时的引号已经没用了，可以去掉这个双引号,也可以留着双引号。
+* 下面的就是JS代码对应的布尔true，此时的引号已经没用了，**可以去掉这个双引号,也可以留着双引号。**
 ```
     <g-button :loading="true">
 ```
@@ -674,8 +674,8 @@ fill:red
 ```
 ### $emit事件
 * 这里需要一个[绑定事件v-on](https://cn.vuejs.org/v2/api/#v-on),@是v-on的缩写。
-* 当有绑定事件，比如点击事件，点击了g-button，这个g-button的单元件组件有比较多的标签（有button，有g-icon，有div和slot），你需要用到[$emit](https://cn.vuejs.org/v2/api/#vm-emit)，这样就可以**告诉父组件这个子组件的哪个标签被这个点击事件触发了**。哪个地方上来引道这个触发，是js里面的对象触发的（相当于整个组件触发一个click事件）
-* **原生的标签点击事件是知道了**,因为原生的button就只有一个button。这种**组件里面的标签比较，就需要靠emit来触发**，字符串模板（template）里面的this是省略掉的。他是通过with来实现的，具体见链接(MDN with)[https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/with]和(Vue 为什么要使用 with 语句？)[https://segmentfault.com/q/1010000018552495]
+* 当有绑定事件，比如点击事件，点击了g-button，这个g-button的单元件组件有比较多的标签（有button，有g-icon，有div和slot），你需要用到[$emit](https://cn.vuejs.org/v2/api/#vm-emit)，这样就可以**告诉父组件这个子组件的哪个标签被这个点击事件触发了**。哪个地方引导这个触发呢？是js里面的对象触发的（相当于整个组件触发一个click事件）
+* **原生的标签点击事件是知道了那个标签被点击了的**,因为原生的button就只有一个button。这种**组件里面的标签比较多的，就需要靠emit来触发，字符串模板（template）里面的this是省略掉的。**他是通过with来实现的，具体见链接[MDN with](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/with)和[Vue 为什么要使用 with 语句？](https://segmentfault.com/q/1010000018552495]
 ```
         <button class="g-button" v-bind:class="{[`icon-${iconPosition}`]:true}" @click="$emit('click')">
 ```
@@ -695,7 +695,7 @@ fill:red
     }
 </script>
 ```
-* props是需要父组件里面的属性的值传给子组件，而data是组件（包括组件或子组件）本身的属性值。比如下面的**左边的loading**是子组件里面props的属性loading，它赋值给**右边的loading1**，右边的loading1是父组件本身的一个变量属性，这个变量属性来自于data。这样这个loading1是一个变量，不是写死的一个值，就可以通过点击事件click后来执行JS代码loading1=!loading1，来改变这个true或者false的状态。
+* props是需要父组件里面的属性的值传给子组件，而**data**是组件（包括组件或子组件）**本身**的属性值。比如下面的**左边的loading**是子组件里面props的属性loading，它赋值给**右边的loading1**，右边的loading1是父组件本身的一个变量属性，这个变量属性来自于data。这样这个loading1是一个变量，不是写死的一个值，就可以通过点击事件click后来执行JS代码loading1=!loading1，来改变这个true或者false的状态。
 ```
     <g-button :loading="loading1" v-on:click="loading1=!loading1">
 ```
