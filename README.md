@@ -675,7 +675,8 @@ fill:red
 ### $emit事件
 * 这里需要一个[绑定事件v-on](https://cn.vuejs.org/v2/api/#v-on),@是v-on的缩写。
 * 当有绑定事件，比如点击事件，点击了g-button，这个g-button的单元件组件有比较多的标签（有button，有g-icon，有div和slot），你需要用到[$emit](https://cn.vuejs.org/v2/api/#vm-emit)，这样就可以**告诉父组件这个子组件的哪个标签被这个点击事件触发了**。哪个地方引导这个触发呢？是js里面的对象触发的（相当于整个组件触发一个click事件）
-* **原生的标签点击事件是知道了那个标签被点击了的**,因为原生的button就只有一个button。这种**组件里面的标签比较多的，就需要靠emit来触发，字符串模板（template）里面的this是省略掉的。**他是通过with来实现的，具体见链接[MDN with](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/with)和[Vue 为什么要使用 with 语句？](https://segmentfault.com/q/1010000018552495]
+* **原生的标签点击事件是知道了那个标签被点击了的**,因为原生的button就只有一个button。
+* 这种**组件里面的标签比较多的，就需要靠emit来触发，字符串模板（template）里面的this是省略掉的**。他是通过with来实现的，具体见链接[MDN with](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/with)和[Vue 为什么要使用 with 语句？](https://segmentfault.com/q/1010000018552495)
 ```
         <button class="g-button" v-bind:class="{[`icon-${iconPosition}`]:true}" @click="$emit('click')">
 ```
