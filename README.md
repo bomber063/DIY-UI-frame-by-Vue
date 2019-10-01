@@ -390,7 +390,7 @@ import Button from './button'
 * export和import的用法[说明](https://www.cnblogs.com/xiaotanke/p/7448383.html)
 ### 一个BUG
 * 如果用户没有传入icon，也就是index.html里面的 g-button没有写icon，那么就会出现一个空的SVG占用位置。
-* 只需要加一个v-if及可，就是icon变量存在的时候才会出现SVG，不存在就不出现SVG
+* 只需要加一个v-if即可，v-if 指令用于条件性地渲染一块内容。这块内容只会在指令的表达式返回 truthy 值的时候被渲染。就是icon变量存在的时候那么就肯定是返回truthy值，才会出现SVG，不存在就不出现SVG
 ```
         <svg v-if="icon" class="icon" aria-hidden="true">
             <use :xlink:href="`#i-${icon}`"></use>
@@ -625,6 +625,7 @@ Vue.component('g-icon',Icon)
             <g-icon class="icon" v-if="icon" :name="icon"></g-icon>
 ```
 ## 增加loading icon
+### loading的CSS样式
 * 继续在iconfont网站找一个加载的图标。
 * 然后增加一个loading-css的class
 ```
@@ -644,7 +645,74 @@ Vue.component('g-icon',Icon)
             animation: rotate 1.5s linear infinite;
         }
 ```
-* * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
+* [SVG](https://developer.mozilla.org/zh-CN/docs/Web/SVG/Tutorial)改变颜色是用fill，比如
+```
+fill:red
+```
+* 增加一个loading 属性
+```
+            'loading':{
+              type:Boolean,
+              default: false
+            },
+```
+* 当属性后面的值要表示变量的时候，属性前面必须要有冒号：或者v-bind:，因为这样的属性值这样才能使JS的代码，比如下面的就是字符串"true"
+```
+    <g-button loading="true">
+```
+* 下面的就是JS代码对应的布尔true，此时的引号已经没用了，可以去掉这个双引号,也可以留着双引号。
+```
+    <g-button :loading="true">
+```
+* 只要loading存在的话，那么icon应该隐藏删除掉，那么就写上下面代码,既有loading又有icon的时候v-if就返回false，如果只有icon，loading为false的时候就返回true.
+```
+      <g-icon class="icon" v-if="icon&&!loading" :name="icon"></g-icon>
+```
+* 为了让loading和icon出现的左右顺序也相同，需要给loading还加上icon的class。这样CSS里面的order控制的顺序也会去控制loading了.
+```
+      <g-icon v-if="loading" name="loading" class="loading-css icon"></g-icon>
+```
+### $emit事件
+* 这里需要一个[绑定事件v-on](https://cn.vuejs.org/v2/api/#v-on),@是v-on的缩写。
+* 当有绑定事件，比如点击事件，点击了g-button，这个g-button的单元件组件有比较多的标签（有button，有g-icon，有div和slot），你需要用到[$emit](https://cn.vuejs.org/v2/api/#vm-emit)，这样就可以**告诉父组件这个子组件的哪个标签被这个点击事件触发了**。哪个地方上来引道这个触发，是js里面的对象触发的（相当于整个组件触发一个click事件）
+* **原生的标签点击事件是知道了**,因为原生的button就只有一个button。这种**组件里面的标签比较，就需要靠emit来触发**，字符串模板（template）里面的this是省略掉的。他是通过with来实现的，具体见链接(MDN with)[https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/with]和(Vue 为什么要使用 with 语句？)[https://segmentfault.com/q/1010000018552495]
+```
+        <button class="g-button" v-bind:class="{[`icon-${iconPosition}`]:true}" @click="$emit('click')">
+```
+* 因为只执行了一句代码所以上面的是简写(不需要写出x这个变量和methods)，下面的是展开后详细的写法，你还可以写成这样,x是methods里面x()
+```
+        <button class="g-button" v-bind:class="{[`icon-${iconPosition}`]:true}" @click="x">
+```
+* script里面，**script里面要写上this**
+```
+<script>
+    export default {
+        methods:{
+            x(){
+                this.$emit('click')
+            }
+        }
+    }
+</script>
+```
+* props是需要父组件里面的属性的值传给子组件，而data是组件（包括组件或子组件）本身的属性值。比如下面的**左边的loading**是子组件里面props的属性loading，它赋值给**右边的loading1**，右边的loading1是父组件本身的一个变量属性，这个变量属性来自于data。这样这个loading1是一个变量，不是写死的一个值，就可以通过点击事件click后来执行JS代码loading1=!loading1，来改变这个true或者false的状态。
+```
+    <g-button :loading="loading1" v-on:click="loading1=!loading1">
+```
+* 父组件的data
+```
+new Vue({
+    el: '#app',
+    data:{
+        loading1:false
+    }
+})
+```
+* [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
+* [data](https://cn.vuejs.org/v2/api/#data),实例创建之后，可以通过 vm.$data 访问原始数据对象。Vue 实例也代理了 data 对象上所有的属性，因此访问 vm.a 等价于访问 vm.$data.a。
+* [el](https://cn.vuejs.org/v2/api/#el)
+* [Vue子组件与父组件(看了就会)](https://blog.csdn.net/HaiJun_Aion/article/details/84801370)
+* [Vue中到底是什么是父组件，什么是子组件？](http://www.imooc.com/wenda/detail/480094)
 ## 其他说明
 * 一个Vue的UI组件。
 * 使用本框架前，请在CSS中开启下面代码
