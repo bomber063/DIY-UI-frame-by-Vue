@@ -65,7 +65,7 @@ npm i --save vue
 npm i vue
 ```
 * 由于安装Vue之后会出现node_modules文件夹，里面有大量的文件，可以选择新建一个.gitignore来设置某个路径的文件并不提交到git hub仓库。
-#### 用webstorm操作后续代码
+#### 用webStorm操作后续代码
 * WebStorm的安装，见链接[JetBrains WebStorm 2019.1 x64 破解](http://www.bcniubi.cn/221)和链接[Webstorm 2019.1 破解](https://blog.csdn.net/fu983531588/article/details/89312799)
 * WebStorm的汉化见链接[webStorm安装及汉化教程](https://blog.csdn.net/qq_33915006/article/details/79696319)
 * WebStorm添加到鼠标右键的方法链接[WebStorm添加右键菜单](https://www.jianshu.com/p/de8f31e11dea)
@@ -80,6 +80,8 @@ npm i vue
 4. 格式化代码（ctrl+alt+L）
 * 在WebStorm中输入Button.log就会自动转换为console.log(Button);
 * 用emmet简化CSS写法可以搜索把emmet里面CSS的Enable fuzzy search among CSS abbreviations打钩
+* CSS背景颜色（background）设置，在设置->编辑器->常规->外观里面找到Show CSS color preview as background打钩即可。
+* webStorm还可以查看你修改的本地历史，可以右键->本地历史->显示历史就可以看到了**用WebStorm修改的所有历史,可以撤回还原代码**
 ## 代码创建一个按钮
 ### 一个WebStorm的警告，不知道为什么
 * 我的WebStorm版本是2019.1
@@ -560,7 +562,7 @@ found in
 ---> <GButton>
        <Root>
 ```
-* 上面的validator代码如果是使用WebStorm编辑器那么就可以看到有黄色小灯泡，里面有一堆优化代码的选项，有很多可以简化的选项，这里选择其中一种，比如可以选择simplify if-else就变成了
+* 上面的validator代码如果是使用WebStorm（他是一种智能的IDE）那么就可以看到有黄色小灯泡，里面有一堆优化代码的选项，有很多可以简化的选项，这里选择其中一种，比如可以选择simplify if-else就变成了
 ```
                 validator(xxx) {
                     return !(xxx !== 'left' && xxx !== 'right');
@@ -783,7 +785,7 @@ Cannot use <slot> as component root element because it may contain multiple node
         }
     }
 ```
-#### 解决可能的风险
+### 解决可能的风险
 * 还存在一个风险，就是如果g-button标签被一个div标签包裹起来会显示出问题。所以通过一些操作来组织这样的代码产生。
 * 这里需要用到下面三个知识点：
 1. 需要稍微了解一下[生命周期图示](https://cn.vuejs.org/v2/guide/instance.html#生命周期图示)的知识，详细的解释可以看下这篇[文章——vue生命周期钩子函数详解](https://blog.csdn.net/qq_35585701/article/details/81216704),我们就知道[mounted函数](https://cn.vuejs.org/v2/api/#mounted)是el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子。那么我们就可以在这个周期的时候通过一些实例属性查询是否存在g-button以外的其他标签（比如div）
@@ -833,7 +835,7 @@ Cannot use <slot> as component root element because it may contain multiple node
     }
 </script>
 ```
-#### 一个小BUG(第一个元素不需要margin-left:-1px)
+### 一个小BUG(第一个元素不需要margin-left:-1px)
 * 只让出了第一个子元素左边移动1px
 ```
     &:not(:first-child){margin-left:-1px;}
