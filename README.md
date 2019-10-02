@@ -786,7 +786,7 @@ Cannot use <slot> as component root element because it may contain multiple node
 #### 解决可能的风险
 * 还存在一个风险，就是如果g-button标签被一个div标签包裹起来会显示出问题。所以通过一些操作来组织这样的代码产生。
 * 这里需要用到下面三个知识点：
-1. 需要稍微了解一下[生命周期图示](https://cn.vuejs.org/v2/guide/instance.html#生命周期图示)的知识，详细的解释可以看下这篇[文章——vue生命周期钩子函数详解](https://blog.csdn.net/qq_35585701/article/details/81216704),我们就知道[mounted函数](https://cn.vuejs.org/v2/api/#mounted)是el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子。那么我们就可以在这个周期的时候通过一些实例属性查询查看是否存在g-button以外的其他标签（比如div）
+1. 需要稍微了解一下[生命周期图示](https://cn.vuejs.org/v2/guide/instance.html#生命周期图示)的知识，详细的解释可以看下这篇[文章——vue生命周期钩子函数详解](https://blog.csdn.net/qq_35585701/article/details/81216704),我们就知道[mounted函数](https://cn.vuejs.org/v2/api/#mounted)是el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子。那么我们就可以在这个周期的时候通过一些实例属性查询是否存在g-button以外的其他标签（比如div）
 2. 此时用[vm.$children](https://cn.vuejs.org/v2/api/#vm-children)是找不到div标签的，因为它只能找到Vue实例的标签。我们可以用[this.$el](https://cn.vuejs.org/v2/api/#vm-el),因为$el是**Vue 实例使用的原生根 DOM 元素实例**
 3. [for of](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/for...of)，该语句遍历可迭代对象定义要迭代的数据（也就是key对应的value）。
 4. [console.warn](https://developer.mozilla.org/zh-CN/docs/Web/API/Console/warn)向 Web 控制台输出一条警告信息
@@ -832,6 +832,11 @@ Cannot use <slot> as component root element because it may contain multiple node
         }
     }
 </script>
+```
+#### 一个小BUG(第一个元素不需要margin-left:-1px)
+* 只让出了第一个子元素左边移动1px
+```
+    &:not(:first-child){margin-left:-1px;}
 ```
 
 * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
