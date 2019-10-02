@@ -709,6 +709,131 @@ new Vue({
     }
 })
 ```
+## CSS整理（代码可以选择把竖向排列变成横向排列，这样可以节省一些空间，不过本次暂时不整理）
+## 上一页和下一页组合在一起的例子效果
+* 新建一个button-group.vue，template里面如果只有slot会报错
+```
+<template>
+    <div>
+    <slot></slot>
+    </div>
+</template>
+```
+* 报错信息
+```
+Cannot use <slot> as component root element because it may contain multiple nodes.
+```
+* 所以最好在slot标签外面加上一个div标签，这样就不会报错了.
+```
+<template>
+    <div>
+    <slot></slot>
+    </div>
+</template>
+```
+### 增加部分CSS
+#### 方法一——用border-left:none
+* 中间的边框可以删除一边( border-left:none)的来达到贴合的目的。用到[CSS 否定伪类:not](https://developer.mozilla.org/zh-CN/docs/Web/CSS/:not)
+```
+    .g-button-group {
+        display: inline-flex;
+        vertical-align: top;
+
+        .g-button {
+            border-radius: 0px;
+            &:not(:first-child){
+                border-left:none
+            }
+            &:first-child {
+                border-bottom-left-radius: var(--border-radius);
+                border-top-left-radius: var(--border-radius);
+            }
+
+            &:last-child {
+                border-bottom-right-radius: var(--border-radius);
+                border-top-right-radius: var(--border-radius);
+            }
+        }
+    }
+```
+* **但是存在一个BUG**,就是除了第一个按钮以外，后面其他的左边的border是没有的（none），那么hover的时候变色就会显得很难看了。所以不要使用这种方法。
+#### 方法二——用margin-left
+* 用margin-left,用到z-index，当hover的时候让他排到最外面，不然会被后面的遮盖住
+```
+    .g-button-group {
+        display: inline-flex;
+        vertical-align: top;
+
+        .g-button {
+            border-radius: 0px;
+            margin-left:-1px;
+            &:first-child {
+                border-bottom-left-radius: var(--border-radius);
+                border-top-left-radius: var(--border-radius);
+            }
+
+            &:last-child {
+                border-bottom-right-radius: var(--border-radius);
+                border-top-right-radius: var(--border-radius);
+            }
+            &:hover{
+                position: relative;
+                z-index: 1;
+            }
+        }
+    }
+```
+#### 解决可能的风险
+* 还存在一个风险，就是如果g-button标签被一个div标签包裹起来会显示出问题。所以通过一些操作来组织这样的代码产生。
+* 这里需要用到下面三个知识点：
+1. 需要稍微了解一下[生命周期图示](https://cn.vuejs.org/v2/guide/instance.html#生命周期图示)的知识，详细的解释可以看下这篇[文章——vue生命周期钩子函数详解](https://blog.csdn.net/qq_35585701/article/details/81216704),我们就知道[mounted函数](https://cn.vuejs.org/v2/api/#mounted)是el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子。那么我们就可以在这个周期的时候通过一些实例属性查询查看是否存在g-button以外的其他标签（比如div）
+2. 此时用[vm.$children](https://cn.vuejs.org/v2/api/#vm-children)是找不到div标签的，因为它只能找到Vue实例的标签。我们可以用[this.$el](https://cn.vuejs.org/v2/api/#vm-el),因为$el是**Vue 实例使用的原生根 DOM 元素实例**
+3. [for of](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/for...of)，该语句遍历可迭代对象定义要迭代的数据（也就是key对应的value）。
+4. [console.warn](https://developer.mozilla.org/zh-CN/docs/Web/API/Console/warn)向 Web 控制台输出一条警告信息
+5. [toLowerCase()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase) 会将调用该方法的字符串值转为小写形式，并返回。
+* 最后g-button-group的CSS代码
+```
+<style lang="scss">
+    .g-button-group {
+        display: inline-flex;
+        vertical-align: top;
+
+        .g-button {
+            border-radius: 0px;
+            margin-left:-1px;
+            &:first-child {
+                border-bottom-left-radius: var(--border-radius);
+                border-top-left-radius: var(--border-radius);
+            }
+
+            &:last-child {
+                border-bottom-right-radius: var(--border-radius);
+                border-top-right-radius: var(--border-radius);
+            }
+            &:hover{
+                position: relative;
+                z-index: 1;
+            }
+        }
+    }
+</style>
+```
+* 最后g-button-group的script代码
+```
+<script>
+    export default {
+        mounted(){
+            // console.log(this.$el.children)
+            for(let node of this.$el.children){
+                if(node.nodeName.toLowerCase()!=='button'){
+                    console.warn(`g-button-group的子元素应该全是g-button元素,但是你使用了${node.nodeName.toLowerCase()}元素`)
+                }
+            }
+        }
+    }
+</script>
+```
+
 * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
 * [data](https://cn.vuejs.org/v2/api/#data),实例创建之后，可以通过 vm.$data 访问原始数据对象。Vue 实例也代理了 data 对象上所有的属性，因此访问 vm.a 等价于访问 vm.$data.a。
 * [el](https://cn.vuejs.org/v2/api/#el)
