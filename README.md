@@ -840,7 +840,25 @@ Cannot use <slot> as component root element because it may contain multiple node
 ```
     &:not(:first-child){margin-left:-1px;}
 ```
-
+## 单元测试
+* 单元测试需要用[chai.js库](https://www.chaijs.com/),Chai is a **BDD / TDD** assertion library for node and the browser that can be delightfully paired with any javascript testing framework.
+* 那么什么是BDD、TDD、assert分别是啥？
+1. [BDD](https://baike.baidu.com/item/BDD/10735732?fr=aladdin)——Behavior Driven Development，行为驱动开发,行为驱动开发是测试驱动开发的扩展：**开发使用了一种简单的，特定于领域的脚本语言（例如，类似于英语的句子）。这些DSL将结构化的自然语言语句（例如，类似于英语的句子）转换为可执行的测试。**
+2. [TDD](https://en.wikipedia.org/wiki/Test-driven_development)——Test-Driven Development,测试驱动开发,是一种软件开发过程，它依赖于非常短的开发周期的重复：将需求转换为非常具体的测试用例，然后对软件进行改进以使测试通过
+3. [assert](https://zh.wikipedia.org/wiki/%E6%96%B7%E8%A8%80_(%E7%A8%8B%E5%BC%8F)),是一种放在程序中的一阶逻辑（如一个结果为真或是假的逻辑判断式），目的是为了标示与验证程序开发者预期的结果－当程序运行到断言的位置时，对应的断言应该为真。若断言不为真时，程序会中止运行，并给出错误消息。
+    * 其实浏览器的控制台就有断言的命令就是[console.assert](https://developer.mozilla.org/zh-CN/docs/Web/API/Console/assert),如果断言为false，则将一个错误消息写入控制台。如果断言是true，没有任何反应。比如下面的判断就是错的，那么就会弹出Assertion failed: console.assert
+    ```
+    console.assert(1===2)//会弹出Assertion failed: console.assert
+    ```
+* 浏览器自带的console.assert功能比较弱，只能判断是真是假，如果需要更多功能可以使用[chai.js库]((https://www.chaijs.com/))。它给了三种形式的断言
+1. Should
+2. Expect
+3. Assert
+* 这里就以Expect举例好了。先安装chai.js,在你的目录属性下面命令,-D是给开发者用的
+```
+npm i -D chai
+```
+* 运行后显示版本chai@4.2.0
 * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
 * [data](https://cn.vuejs.org/v2/api/#data),实例创建之后，可以通过 vm.$data 访问原始数据对象。Vue 实例也代理了 data 对象上所有的属性，因此访问 vm.a 等价于访问 vm.$data.a。
 * [el](https://cn.vuejs.org/v2/api/#el)
