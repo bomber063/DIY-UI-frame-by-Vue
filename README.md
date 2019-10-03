@@ -841,6 +841,7 @@ Cannot use <slot> as component root element because it may contain multiple node
     &:not(:first-child){margin-left:-1px;}
 ```
 ### 这里把变量loading改成loadings，为了不合svg的loading名字冲突
+* 这里的loading是svg的一个标签属性名字中的一段文字，而loadings是属性props.
 * button.vue里面由
 ```
 <template>
@@ -885,8 +886,8 @@ Cannot use <slot> as component root element because it may contain multiple node
         按钮
     </g-button>
 ```
-### 加冒号好不加冒号区别
-* icon.vue中下面的代码name如果**不加冒号**：icon.vue这个组件产生的标签g-icon中有一个name属性(也就是props:['name'])。**右边的赋值就是一个字符串**，除非是字符串的情况下才会这样写。
+### 加冒号和不加冒号区别
+* icon.vue中下面的代码name如果**不加冒号**：icon.vue这个组件产生的标签g-icon中有一个name属性(也就是props:['name'])。**右边的赋值就是一个字符串**，除非是字符串的情况下才会这样写。**就算你在这里写的不是字符串它也会把它转换为字符串**
 ```
             <g-icon v-if="loadings" name="loading" class="loading-css icon"></g-icon>
 ```
