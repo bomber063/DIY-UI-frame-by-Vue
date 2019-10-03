@@ -3,8 +3,8 @@
 <!--            <svg v-if="icon" class="icon" >-->
 <!--                <use :xlink:href="`#i-${icon}`"></use>-->
 <!--            </svg>-->
-            <g-icon v-if="loading" name="loading" class="loading-css icon"></g-icon>
-            <g-icon class="icon" v-if="icon&&!loading" :name="icon"></g-icon>
+            <g-icon v-if="loadings" :name=String("loading") class="loading-css icon"></g-icon>
+            <g-icon class="icon" v-if="icon&&!loadings" :name="icon"></g-icon>
             <div class="content">
                 <slot></slot>
             </div>
@@ -15,7 +15,7 @@
         // props:['icon','icon-position']
         props: {
             'icon': {},
-            'loading':{
+            'loadings':{
               type:Boolean,
               default: false
             },

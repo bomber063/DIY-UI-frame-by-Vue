@@ -21,3 +21,15 @@ new Vue({
 // console.log(a.$el.data===a.data)
 
 // console.log(a)
+
+//单元测试
+{
+    const Constructor=Vue.extend(Button)
+    const button=new Constructor({
+        propsData:{
+            icon:'setting'
+        }
+    })
+    button.$mount(test)
+}
+

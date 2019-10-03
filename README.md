@@ -840,7 +840,62 @@ Cannot use <slot> as component root element because it may contain multiple node
 ```
     &:not(:first-child){margin-left:-1px;}
 ```
+### 这里把变量loading改成loadings，为了不合svg的loading名字冲突
+* button.vue里面由
+```
+<template>
+            <g-icon v-if="loading" name="loading" class="loading-css icon"></g-icon>
+</template>
+<script>
+    export default {
+        props: {
+            'loading':{
+              type:Boolean,
+              default: false
+            }
+        }
+    }
+</script>
+```
+* 修改为
+```
+<template>
+            <g-icon v-if="loadings" name="loading" class="loading-css icon"></g-icon>
+</template>
+<script>
+    export default {
+        props: {
+            'loadings':{
+              type:Boolean,
+              default: false
+            }
+        }
+    }
+</script>
+```
+* index.html里面由
+```
+    <g-button :loading="loading1" v-on:click="loading1=!loading1">
+        按钮
+    </g-button>
+```
+* 修改为
+```
+    <g-button :loadings="loading1" v-on:click="loading1=!loading1">
+        按钮
+    </g-button>
+```
+### 加冒号好不加冒号区别
+* icon.vue中下面的代码name如果**不加冒号**：icon.vue这个组件产生的标签g-icon中有一个name属性(也就是props:['name'])。**右边的赋值就是一个字符串**，除非是字符串的情况下才会这样写。
+```
+            <g-icon v-if="loadings" name="loading" class="loading-css icon"></g-icon>
+```
+* icon.vue中下面的代码name如果**加冒号**：icon.vue这个组件产生的标签g-icon中有一个name属性。**右边的赋值就是一个变量**，因为这里要用到的是字符串，所以如果写成变量的形式可以把它通过String() 转换为字符串。
+```
+            <g-icon v-if="loadings" :name=String("loading") class="loading-css icon"></g-icon>
+```
 ## 单元测试
+* Vue上面就有[单元测试](https://cn.vuejs.org/v2/guide/unit-testing.html)的说明，但是目前看的不是很懂。
 * 单元测试需要用[chai.js库](https://www.chaijs.com/),Chai is a **BDD / TDD** assertion library for node and the browser that can be delightfully paired with any javascript testing framework.
 * 那么什么是BDD、TDD、assert分别是啥？
 1. [BDD](https://baike.baidu.com/item/BDD/10735732?fr=aladdin)——Behavior Driven Development，行为驱动开发,行为驱动开发是测试驱动开发的扩展：**开发使用了一种简单的，特定于领域的脚本语言（例如，类似于英语的句子）。这些DSL将结构化的自然语言语句（例如，类似于英语的句子）转换为可执行的测试。**
@@ -859,6 +914,50 @@ Cannot use <slot> as component root element because it may contain multiple node
 npm i -D chai
 ```
 * 运行后显示版本chai@4.2.0
+### 通过Vue.extend构造一个函数
+* 这里用需要构造一个函数，用到[Vue.extend](https://cn.vuejs.org/v2/api/#Vue-extend),使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。data 选项是特例，需要注意 - 在 Vue.extend() 中它必须是函数
+* 我们**通过JS把按钮写到页面里面**，通过一个方法（Vue.extend方法）构造函数，用new就可以Vue实例一个对象，然后挂载([vm.$mount](https://cn.vuejs.org/v2/api/#vm-mount))到一个标签上面。比如下面代码
+```
+    const Constructor=Vue.extend(Button)//button组件变成构造函数
+    const button=new Constructor()//通过这个构造函数new之后变成一个Vue实例
+    button.$mount(test)//把button这个Vue实例挂载到id为test的标签上面。
+```
+* index.html上新增一个测试的id=text
+```
+    <div id="test"></div>
+```
+* 这样就通过JS把按钮写到页面里面了
+* 这里如果不挂载到标签上它只能只是一个虚拟的DOM。
+* 因为Button是来自于import Button from './button'，这个button.vue里面的属性如下：
+```
+        props: {
+            'icon': {},
+            'loading':{
+              type:Boolean,
+              default: false
+            },
+            'iconPosition': {
+                type: String,
+                default: 'left',
+                validator(xxx) {
+                    return xxx === 'left' || xxx === 'right';
+                }
+            }
+        }
+```
+### 使用propData来修改new创建的实例的属性值
+* 怎么来修改或者设置props里面的各种属性的值呢，**这里可以通过[propsData](https://cn.vuejs.org/v2/api/#propsData)来修改属性值**,限制：只用于 new 创建的实例中。创建实例时传递 props。主要作用是方便测试。
+* 这样就可以通过
+```
+    const button=new Constructor({
+        propsData:{
+            icon:'setting'
+        }
+    })
+```
+* 这样就可以在页面上看到一个button的icon了。
+
+
 * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
 * [data](https://cn.vuejs.org/v2/api/#data),实例创建之后，可以通过 vm.$data 访问原始数据对象。Vue 实例也代理了 data 对象上所有的属性，因此访问 vm.a 等价于访问 vm.$data.a。
 * [el](https://cn.vuejs.org/v2/api/#el)
