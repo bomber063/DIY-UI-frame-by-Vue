@@ -25,7 +25,10 @@ new Vue({
 //单元测试
 //一个测试代码是测试输入一个icon:setting，得到对应的xlink:href是否与#i-setting匹配。
 import chai from 'chai'
+import spies from 'chai-spies'
+chai.use(spies)
 const expect=chai.expect
+
 {
     const Constructor=Vue.extend(Button)
     const vm=new Constructor({
@@ -122,7 +125,6 @@ const expect=chai.expect
 
 //触发click的测试
 {
-    //mock
     const div=document.createElement('div')
     document.body.appendChild(div)
     const Constructor=Vue.extend(Button)
@@ -144,3 +146,24 @@ const expect=chai.expect
     vm.$destroy()//测试完后为了不增加多余内存最好移除。
 }
 
+// 用mock触发click的测试，点击事件测试不需要挂到到某个div上面。
+{
+    // const div=document.createElement('div')
+    // document.body.appendChild(div)
+    const Constructor=Vue.extend(Button)
+    const vm=new Constructor({
+        propsData:{
+            icon:'setting',
+            iconPosition:'right'
+        }
+    })
+    //用spy来监听function(){}函数
+    let spy=chai.spy(function(){})
+    vm.$mount()
+    vm.$on('click',spy)//click来触发这个spy函数，前面spy已经监听了function(){}
+    vm.$el.click()//在根元素上触发这个click事件，也就是执行了这个click事件，也就是调用了click
+    expect(spy).to.have.been.called()//我们期待spy这个间谍已经被调用了
+
+    vm.$el.remove()//测试完后为了不增加页面多余的button和内存最好移除。
+    vm.$destroy()//测试完后为了不增加多余内存最好移除。
+}

@@ -1069,7 +1069,7 @@ const expect=chai.expect
 4. 触发click的测试
    * 这里需要用到[vm.$on](https://cn.vuejs.org/v2/api/#vm-on)
    * 因为这里就需要点击根元素，vm.$el.click()效果其实和vm.$emit('click')是一样的。前面的是原生DOM的click用法，后面你的是Vue的click用法。
-   * 下面的 
+   * 下面的代码就可以看到执行click事件后会打出一个1。
    ```
    {    //mock
        const div=document.createElement('div')
@@ -1087,13 +1087,41 @@ const expect=chai.expect
        })
        // vm.$emit('click')//下面的代码其实就是这句的意思，效果是一样的。
        vm.$el.click()
-   
-   
+      
        vm.$el.remove()//测试完后为了不增加页面多余的button和内存最好移除。
        vm.$destroy()//测试完后为了不增加多余内存最好移除。
    }
    ```
-   * 加入断言的语法来判断
+   * 加入断言的语法来判断，这里需要引入一个chai.js库的一个插件（plugins）-[chai.spies](https://www.chaijs.com/plugins/chai-spies/),是一个mock的方式。**因为这样才能判断是某个函数执行了**，安装
+   ```
+   $ npm i -D chai-spies
+   ```
+   * 这里用到to.have.been.called这个api，[chai.spies](https://www.chaijs.com/plugins/chai-spies/)官网上也有相应的的说明。有人也写过类似的[博客单元测试](https://blog.csdn.net/weixin_33826609/article/details/88006141)
+   * 这是一个函数的mock
+   ```
+   // 用mock触发click的测试，点击事件测试不需要挂到到某个div上面。
+   import spies from 'chai-spies'
+   chai.use(spies)
+   {
+       const Constructor=Vue.extend(Button)
+       const vm=new Constructor({
+           propsData:{
+               icon:'setting',
+               iconPosition:'right'
+           }
+       })
+       //用spy来监听function(){}函数
+       let spy=chai.spy(function(){})
+       vm.$mount()
+       vm.$on('click',spy)//click来触发这个spy函数，前面spy已经监听了function(){}
+       vm.$el.click()//在根元素上触发这个click事件，也就是执行了这个click事件，也就是调用了click
+       expect(spy).to.have.been.called()//我们期待spy这个间谍已经被调用了
+       
+       vm.$el.remove()//测试完后为了不增加页面多余的button和内存最好移除。
+       vm.$destroy()//测试完后为了不增加多余内存最好移除。
+   }
+   ```
+   * 这样就能确保你在点击click这个button的时候会触发
 
 
 * 除了单元测试，还有[E2E测试](https://blog.csdn.net/qq_39300332/article/details/81197503),不过这是在大型需求中**关键步骤才用到，比如下单**等。
