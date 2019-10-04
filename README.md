@@ -71,7 +71,7 @@ npm i vue
 * WebStorm添加到鼠标右键的方法链接[WebStorm添加右键菜单](https://www.jianshu.com/p/de8f31e11dea)
 * WebStorm修改字体方法链接[WebStorm设置编辑器中的字体大小及样式](https://www.cnblogs.com/dzlishen/p/4253280.html)
 * 添加一个设置，调试器（Debugger）里面把允许未签名（Allow unsigned requests）的选项打钩，具体为什么暂时不清楚，我自己搜索了一下，可能是这个而连接[webstorm打开的页面如何通过手机访问？](https://blog.csdn.net/qq_28296925/article/details/94602731)
-* 添加一个设置，在系统设置（system settings）取消勾选关闭 WebStorm 的 Safe Write 功能，也就是Use'safe write'(save changes to a temporary file first)这个选项去掉打钩。可能的原因是[webstorm不能自动重新编译问题](https://blog.csdn.net/qq_34149935/article/details/79224263)
+* 添加一个设置，在系统设置（system settings）取消勾选关闭 WebStorm 的 Safe Write 功能，也就是Use'safe write'(save changes to a temporary file first)这个选项去掉打钩。可能的原因是[webStorm不能自动重新编译问题](https://blog.csdn.net/qq_34149935/article/details/79224263)
 * 视频中的额WebStorm只支持ES5的写法，可能是老版本的，有些ES6的写法会出现警告或者下划线，不过可以点击红灯泡来解决。不过现在都支持了。
 * 两个最常用的**快捷键**:
 1. shift shift，就是按两下shift，它会给你一个搜索框，可以搜索其他任意的快捷键,比如可以搜VCS，它的全称是version control system,版本控制系统，就是用于git操作的。搜索vcs后可以看到一个vcs Operations Popup，它可以用于与git操作，所以webstorm可以代替git bash这个软件。当然有时候会git操作失败，失败就继续用git bash吧。
@@ -82,6 +82,7 @@ npm i vue
 * 用emmet简化CSS写法可以搜索把emmet里面CSS的Enable fuzzy search among CSS abbreviations打钩
 * CSS背景颜色（background）设置，在设置->编辑器->常规->外观里面找到Show CSS color preview as background打钩即可。
 * webStorm还可以查看你修改的本地历史，可以右键->本地历史->显示历史就可以看到了**用WebStorm修改的所有历史,可以撤回还原代码**
+* webStorm可以统一一次把所有变量替换为你需要的变量，鼠标右键点击**重构重命名,在这个作用域里面的变量都可以一次性修改**
 ## 代码创建一个按钮
 ### 一个WebStorm的警告，不知道为什么
 * 我的WebStorm版本是2019.1
@@ -897,6 +898,7 @@ Cannot use <slot> as component root element because it may contain multiple node
 ```
 ## 单元测试
 * Vue上面就有[单元测试](https://cn.vuejs.org/v2/guide/unit-testing.html)的说明，但是目前看的不是很懂。
+* 单元测试就是你去传一个输入，从输出后看跟你输入的东西是否匹配，不匹配就报错。
 * 单元测试需要用[chai.js库](https://www.chaijs.com/),Chai is a **BDD / TDD** assertion library for node and the browser that can be delightfully paired with any javascript testing framework.
 * 那么什么是BDD、TDD、assert分别是啥？
 1. [BDD](https://baike.baidu.com/item/BDD/10735732?fr=aladdin)——Behavior Driven Development，行为驱动开发,行为驱动开发是测试驱动开发的扩展：**开发使用了一种简单的，特定于领域的脚本语言（例如，类似于英语的句子）。这些DSL将结构化的自然语言语句（例如，类似于英语的句子）转换为可执行的测试。**
@@ -917,7 +919,7 @@ npm i -D chai
 * 运行后显示版本chai@4.2.0
 ### 通过Vue.extend构造一个函数
 * 这里用需要构造一个函数，用到[Vue.extend](https://cn.vuejs.org/v2/api/#Vue-extend),使用基础 Vue 构造器，创建一个“子类”。参数是一个包含组件选项的对象。data 选项是特例，需要注意 - 在 Vue.extend() 中它必须是函数
-* 我们**通过JS把按钮写到页面里面**，通过一个方法（Vue.extend方法）构造函数，用new就可以Vue实例一个对象，然后挂载([vm.$mount](https://cn.vuejs.org/v2/api/#vm-mount))到一个标签上面。比如下面代码
+* 我们**通过JS把按钮写到页面里面**，通过一个方法（Vue.extend方法）构造函数，用new就可以Vue实例一个对象，然后挂载([vm.$mount](https://cn.vuejs.org/v2/api/#vm-mount))到一个标签上面。如果 Vue 实例在实例化时没有收到 el 选项，则它处于“未挂载”状态，没有关联的 DOM 元素。可以使用 vm.$mount() 手动地**挂载一个未挂载的实例(挂载多个会报错)**。比如下面代码
 ```
     const Constructor=Vue.extend(Button)//button组件变成构造函数
     const button=new Constructor()//通过这个构造函数new之后变成一个Vue实例
@@ -950,14 +952,151 @@ npm i -D chai
 * 怎么来修改或者设置props里面的各种属性的值呢，**这里可以通过[propsData](https://cn.vuejs.org/v2/api/#propsData)来修改属性值**,限制：只用于 new 创建的实例中。创建实例时传递 props。主要作用是方便测试。
 * 这样就可以通过
 ```
-    const button=new Constructor({
+    const vm=new Constructor({
         propsData:{
             icon:'setting'
         }
     })
 ```
 * 这样就可以在页面上看到一个button的icon了。
+### 测试代码
+* 单元测试就是放一个输入得到一个输出，**一般哪些东西需要单元测试呢？只要看一下有哪些输入参数,也就是props，除此之外还有触发的事件，比如click**。
+* 测试完后，增加的页面多余的button或者显示还有内存最好清除掉，比如
+```
+    button.$el.remove()//测试完后为了不增加页面多余的button和内存最好移除。
+    button.$destroy()//测试完后为了不增加多余内存最好移除。
+```
+* 测试代码如下
+1. 第一个测试代码是测试输入一个icon:setting，得到对应的xlink:href是否与#i-setting匹配。
+```
+import chai from 'chai'
+const expect=chai.expect
+{
+    const Constructor=Vue.extend(Button)
+    const vm=new Constructor({
+        propsData:{
+            icon:'setting'
+        }
+    })
+    vm.$mount(test)
+    let useElement=vm.$el.querySelector('use')
+    expect(useElement.getAttribute('xlink:href')).to.equal('#i-setting')//这个看起来很像英文的写法
+    // console.assert(useElement.getAttribute('xlink:href')==='#i-setting') 这个JS语法的写法
+    vm.$el.remove()//测试完后为了不增加页面多余的button和内存最好移除。
+    vm.$destroy()//测试完后为了不增加多余内存最好移除。
+}
+```
+   * 这里最后一行的expect看起很像英文的写法，如果用JS语言应该是console.assert(useElement.getAttribute('xlink:href')==='#i-setting')，如果返回的不是true就会显示报错。
+   * 另外提醒一下,如果不$mount到test上，比如把$mount(test)改成$mount()也是可以正常执行的
+2. 第二个测试，输入一个icon:setting并且loadings:true，得到对应的xlink:href是否与#i-loading匹配。也就是loading在true的时候隐藏掉icon，只显示loading
+```
+{
+    const Constructor=Vue.extend(Button)
+    const vm=new Constructor({
+        propsData:{
+            icon:'setting',
+            loadings:true
+        }
+    })
+    vm.$mount()
+    let useElement=vm.$el.querySelector('use')
+    expect(useElement.getAttribute('xlink:href')).to.equal('#i-loading')
 
+    vm.$el.remove()//测试完后为了不增加页面多余的button和内存最好移除。
+    vm.$destroy()//测试完后为了不增加多余内存最好移除。
+}
+```
+3. 测试svg的order,order就是顺讯，也就是左边还是右边，这里如果要获取到CSS的属性就需要渲染后才可以获取到。**如果button不在页面里面，就不会渲染CSS**,下面的代码是获取不到svg的CSS的order属性的。
+   * [window.getComputedStyle](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/getComputedStyle)方法返回一个对象，该对象在应用活动样式表并解析这些值可能包含的任何基本计算后报告元素的所有CSS属性的值。 私有的CSS属性值可以通过对象提供的API或通过简单地使用CSS属性名称进行索引来访问。这里获取到的所有CSS属性值都是**字符串**
+```
+{
+    const Constructor=Vue.extend(Button)
+    const vm=new Constructor({
+        propsData:{
+            icon:'setting',
+            iconPosition:'right'
+        }
+    })
+    button.$mount()
+    let svg=vm.$el.querySelector('svg')
+    let order=window.getComputedStyle(svg).order
+    console.log(order)//这里的order是没有任何信息的。
+        vm.$el.remove()//测试完后为了不增加页面多余的button和内存最好移除。
+        vm.$destroy()//测试完后为了不增加多余内存最好移除。
+}
+```
+   * 所以需要把vm挂载到页面里面,所以需要创建一个div放到body下面，然后再把这个vm挂载到这个div上，这样button就会出现在页面里面，出现在页面里面就会有样式，就会渲染CSS啦。我们就可以使用window.getComputedStyle这个API了。
+   ```
+   {
+       const div=document.createElement('div')
+       document.body.appendChild(div)
+       const Constructor=Vue.extend(Button)
+       const vm=new Constructor({
+           propsData:{
+               icon:'setting',
+               iconPosition:'right'
+           }
+       })
+       vm.$mount(div)
+       let svg=vm.$el.querySelector('svg')
+       let order=window.getComputedStyle(svg).order
+       expect(order).to.equal('2')//这里iconPosition:'right',所以的order就是'2'
+   
+       vm.$el.remove()//测试完后为了不增加页面多余的button和内存最好移除。
+       vm.$destroy()//测试完后为了不增加多余内存最好移除。
+   }
+   ```
+   * 如果只是通过设置属性这样的方式也可以，代码也比较简答
+   ```
+   {
+       const div=document.createElement('div')
+       document.body.appendChild(div)
+       const Constructor=Vue.extend(Button)
+       const vm=new Constructor({
+           propsData:{
+               icon:'setting',
+               iconPosition:'right'
+           }
+       })
+       vm.$mount(div)
+       let useElement=vm.$el
+       expect(useElement.getAttribute('class')).to.equal('g-button icon-right')
+   
+       vm.$el.remove()//测试完后为了不增加页面多余的button和内存最好移除。
+       vm.$destroy()//测试完后为了不增加多余内存最好移除。
+   }
+   ```
+4. 触发click的测试
+   * 这里需要用到[vm.$on](https://cn.vuejs.org/v2/api/#vm-on)
+   * 因为这里就需要点击根元素，vm.$el.click()效果其实和vm.$emit('click')是一样的。前面的是原生DOM的click用法，后面你的是Vue的click用法。
+   * 下面的 
+   ```
+   {    //mock
+       const div=document.createElement('div')
+       document.body.appendChild(div)
+       const Constructor=Vue.extend(Button)
+       const vm=new Constructor({
+           propsData:{
+               icon:'setting',
+               iconPosition:'right'
+           }
+       })
+       vm.$mount(div)
+       vm.$on('click',function(){
+           console.log(1)
+       })
+       // vm.$emit('click')//下面的代码其实就是这句的意思，效果是一样的。
+       vm.$el.click()
+   
+   
+       vm.$el.remove()//测试完后为了不增加页面多余的button和内存最好移除。
+       vm.$destroy()//测试完后为了不增加多余内存最好移除。
+   }
+   ```
+   * 加入断言的语法来判断
+
+
+* 除了单元测试，还有[E2E测试](https://blog.csdn.net/qq_39300332/article/details/81197503),不过这是在大型需求中**关键步骤才用到，比如下单**等。
 
 * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
 * [data](https://cn.vuejs.org/v2/api/#data),实例创建之后，可以通过 vm.$data 访问原始数据对象。Vue 实例也代理了 data 对象上所有的属性，因此访问 vm.a 等价于访问 vm.$data.a。
