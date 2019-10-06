@@ -52,7 +52,7 @@ try {
         const vm = new Constructor({
             propsData: {
                 icon: 'setting',
-                loadings: true
+                loadings: false
             }
         })
         vm.$mount()
@@ -171,7 +171,7 @@ try {
         vm.$destroy()//测试完后为了不增加多余内存最好移除。
     }
 }catch(error){
-    window.errors[error]
+    window.errors=[error]
 }finally{
     window.errors&&window.errors.forEach((error)=>{
         console.error(error.message)
