@@ -171,9 +171,11 @@ try {
         vm.$destroy()//测试完后为了不增加多余内存最好移除。
     }
 }catch(error){
-    window.errors=[error]
+    // console.dir(error)
+    window.errors=[error]//如果前面的try报错，那么报错信息就是这个参数error，这里只是给window增加一个errors的属性，它的值赋值为数组[error]，这个error是一个对象，它有message和stack等属性。
+    // window.errors=[error]
 }finally{
-    window.errors&&window.errors.forEach((error)=>{
+    window.errors&&window.errors.forEach((error)=>{//如果window.errors存在的前提，就把window.errors通过遍历并按照报错的方式打印出error的message属性
         console.error(error.message)
     })
 }
