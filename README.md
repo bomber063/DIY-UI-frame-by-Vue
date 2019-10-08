@@ -1562,9 +1562,7 @@ before_script:
 * 以上就是持续集成的一部分——持续测试，除此之外还有持续交付和持续部署等。就是所有的东西可以走可持续的操作可持续的各种操作。中间不要断开。
 ## 让自己的这些代码发布给所有其他用户使用
 * 首先要确保自己的代码测试通过，我们可以查看Vue.js代码的测试记过，进入[Vue.js的git hub](https://github.com/vuejs/vue),我们点击passing,就可以进入到Vue.js的[测试界面](https://circleci.com/gh/vuejs/vue/tree/dev),可以看到他是用circleCI来测试做的。并且在Vue.js的test目录下面可以看到测试代码。通过该它的[package.json](https://github.com/vuejs/vue/blob/dev/package.json)看到它用的是jasmine这个插件做测试。你还可以查看react和Angular的测试信息。
-* 然后确保你的代码上传到了[npmjs.org](https://www.npmjs.com/)
-
-
+* 上传代码到[npmjs.org](https://www.npmjs.com/)
    1. 在上传之前你需要把你的package.json的版本号修改成0.0.1，因为默认的一般是1.0.0，如果是1.0.0说明整个框架写完了，但是目前还没有写完。
    ```
      "version": "0.0.1",
@@ -1591,12 +1589,84 @@ before_script:
       ```
       //registry=http://registry.npm.taobao.org/
       ```
-      * 出现Logged in as bomber（这里是你的名字） on，就代表成功了(**我发现我是window用户，在大陆没有更换taobao源也没有报错**)
+      * 出现Logged in as bomber66（这里是你的名字） on，就代表成功了
    7. 如果错误提示里面含有 https://registry.npm.taobao.org 则说明你的 npm 源目前为淘宝源，需要更换为 npm 官方源
       运行 npm publish（由于我的这框架还有一些问题，所以把package.json里面的名字name修改为gulu-bomber-2019108,这样就没有人会去搜这个名字了，怕出丑）
       ```
         "name": "gulu-bomber-2019108",
       ```
+   8. 输入你的npm的登录名，密码和邮箱即可在本地登录了(这里如果你的name名字很奇怪，会被当做垃圾报错).报错如下
+   ```
+   npm ERR! Package name triggered spam detection; if you believe this is in error, please contact support@npmjs.com : gulu-bomber-2019108
+   ```
+   9. 我改成
+   ```
+       "name": "gulu-bomber-1-1",
+   ```
+   10. 终于没问题了，出现下面信息就可以使用了,然后你的邮箱中也会受到你发布成功的邮件。
+   ```
+   + gulu-bomber-1-1@0.0.1
+   ```
+* 接下来是别人来下载。
+   1. 我自己测试下载，建立一个文件夹，命名最好不要是中文，然后先初始化,运行，[如果不初始化会报错](https://blog.csdn.net/MyDilrabaSister/article/details/90694539)
+   ```
+   npm init -y
+   ```
+   2. 然后运行下面代码就可以下载保存到本地该文件夹的node_modules目录下面了。
+   ```
+   npm i gulu-bomber-1-1
+   yarn add gulu-bomber-1-1//如果是yarn就是这个命令
+   ```
+* 其实不需要上传所有代码，有些没有用的代码可以废弃掉，这个后面在说。
+* 完成之后可以把taobao源设置回来，不然你下载安装其他东西的时候速度会比较慢（除非你用的是[cnpm](https://www.jianshu.com/p/115594f64b41)）。
+### 使用自己的包
+* 预测其他使用你的包的人会怎么使用(理论上下面三种都要测试，但是我这里只测试vue-cli)
+   1. 使用 vue-cli(这里以这个为基础来说明)
+      * 一般用户会去的搜索[vue-cli官网](https://cli.vuejs.org/guide/installation.html)如何安装
+      ```
+      npm install -g @vue/cli
+      ```
+      * 然后根据[vue-create](https://cli.vuejs.org/guide/creating-a-project.html#vue-create)创建项目
+      * 记住如果前面使用的是npm，那么vue-cli也要安装配置的时候选择npm才可以，如果选择yarn会报错。
+      * 然后根据提示：进入到 hello,运行server
+      ```
+       $ cd hello-world
+       $ npm run serve
+      ```
+      * 然后下载我们刚刚发布会的包
+      ```
+      npm i gulu-bomber-1-1
+      ```
+      * 现在你去把刚刚发布的包的变量引入到main.js里面进来还是**会报错的,因为node暂时不支持import语法**，所以我们应该用babel把import变成可执行的js语法，然后再次暴露给用户
+      ```
+      import {Button,ButtonGroup,Icon} from 'gulu-bomber-1-1'
+      
+      Window.console.log(Button)
+      ```
+      * 只需要用parcel build一下就可以把import代码编程node可以认识的代码了
+      ```
+      npx parcel build index.js --no-minify
+      ```
+      * 转换后的代码是在dist目录，所以package.json里面的入口main也是需要修改增加dist这个目录的
+      ```
+        "main": "dist/index.js",
+      ```
+      * 然后需要**再次发布**
+      ```
+      
+      ```
+   2. 使用 webpack
+   3. 使用 parcel
+* 分别使用这些方式来使用自己的包（我们只以 vue-cli 为例）
+   1. 使用过程中我们发现报错说 import 语法有问题，那时因为 node 目前确实不支持 import，我们需要用 babel 转译 import
+      1. 你可以要求使用者自己用 babel 来转译（这种方式不推荐，是写库写框架或者轮子给别人用的大忌）
+      2. 你也可以转义好了再给他用
+         * `npx parcel build index.js --no-minify` （本来不应该加 --no-minify 的，奈何不加会有 bug，HTML 压缩把 slot 标签全删了）
+         * 将 package.json 的 main 改为 dist/index.js
+   2. 使用 npm link 或者 yarn link 来加速调试
+      1. 你每次修改源码之后，有两条路让别人得到最新效果
+         1. 更新 package.json 里的 version，然后 npm publish。别人通过 npm update xxx 来更新。
+         2. 如果你只是为了本地调试，可以在项目目录使用 npm link，然后在使用之处运行 npm link xxx，就是最新了
 
 
 
