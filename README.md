@@ -1,4 +1,4 @@
-# DIY-UI-frame-by-Vue
+# DIY-UI-frame-by-Vue——框架搭建，持续集成
 ## 大致的知识点
 1. parcel
 2. scss
@@ -1122,6 +1122,424 @@ const expect=chai.expect
    }
    ```
    * 这样就能确保你在点击click这个button的时候会触发
+   * 给app.js增加一个try...catch...finally代码如下：用到的API有 [console.error](https://developer.mozilla.org/zh-CN/docs/Web/API/Console/error),[try...catch](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/try...catch)
+   ```
+   try{
+      ...
+   }catch(error){
+       // console.dir(error)
+       window.errors=[error]//如果前面的try报错，那么报错信息就是这个参数error，这里只是给window增加一个errors的属性，它的值赋值为数组[error]，这个error是一个对象，它有message和stack等属性。
+       // window.errors=[error]
+   }finally{
+       window.errors&&window.errors.forEach((error)=>{//如果window.errors存在的前提，就把window.errors通过遍历并按照报错的方式打印出error的message属性
+           console.error(error.message)
+       })
+   }
+   ```
+***
+* 目前我们的单元测试需要刷新页面，还需要开启parcel，还需要打开浏览器的控制台，显得比较多操作，能否用一行命令行搞定？
+***
+## 自动化测试，持续集成
+1. 自动化测试
+2. 持续集成
+3. 重写所有代码
+4. 发布npm包
+5. 完善README
+### 使用Karma做自动化测试
+* 前面的测试都需要**手动打开浏览器并点击刷新才可以执行测试**，能否这些步骤都自动呢？可以实现。用到下面三个工具：
+1. Karma（[ˈkɑrmə] 卡玛）是一个测试运行器，它可以呼起浏览器，加载测试脚本，然后运行测试用例
+2. Mocha（[ˈmoʊkə] 摩卡）是一个单元测试框架/库，它可以用来写测试用例
+3. Sinon（西农）是一个 spy / stub / mock 库，用以辅助测试（使用后才能理解）
+* (1)首先安装下面一堆的工具（**主要是Karma**）
+```
+npm i -D karma karma-chrome-launcher karma-mocha karma-sinon-chai mocha sinon sinon-chai karma-chai karma-chai-spies
+```
+* 安装完之后会显示安装的信息及版本
+```
++ karma-mocha@1.3.0
++ karma-sinon-chai@2.0.2
++ sinon-chai@3.3.0
++ karma-chai-spies@0.1.4
++ mocha@6.2.1
++ karma-chai@0.1.0
++ karma@4.3.0
++ sinon@7.5.0
++ karma-chrome-launcher@3.1.0
+```
+* (2)创建karma配置，新建一个karma.conf.js,文件内容如下
+```
+ // 新建 karma.conf.js，内容如下
+ module.exports = function (config) {
+     config.set({
+
+         // base path that will be used to resolve all patterns (eg. files, exclude)
+         basePath: '',
+            // frameworks to use
+            // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+            frameworks: ['mocha', 'sinon-chai'],
+            client: {
+                chai: {
+                    includeStack: true
+                }
+            },
+
+
+            // list of files / patterns to load in the browser
+            files: [
+                'dist/**/*.test.js',
+                'dist/**/*.test.css'
+            ],
+
+
+            // list of files / patterns to exclude
+            exclude: [],
+
+
+            // preprocess matching files before serving them to the browser
+            // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+            preprocessors: {},
+
+
+            // test results reporter to use
+            // possible values: 'dots', 'progress'
+            // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+            reporters: ['progress'],
+
+
+            // web server port
+            port: 9876,
+
+
+            // enable / disable colors in the output (reporters and logs)
+            colors: true,
+
+
+            // level of logging
+            // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+            logLevel: config.LOG_INFO,
+
+
+            // enable / disable watching file and executing tests whenever any file changes
+            autoWatch: true,
+
+
+            // start these browsers
+            // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+            browsers: ['ChromeHeadless'],
+
+
+            // Continuous Integration mode
+            // if true, Karma captures browsers, runs the tests and exits
+            singleRun: false,
+
+            // Concurrency level
+            // how many browser should be started simultaneous
+            concurrency: Infinity
+        })
+    }
+```
+* (3)创建 test/button.test.js 文件，具体内容如下：
+```
+ const expect = chai.expect;
+ import Vue from 'vue'
+ import Button from '../src/button'
+
+ Vue.config.productionTip = false
+ Vue.config.devtools = false
+
+ describe('Button', () => {
+     it('存在.', () => {
+         expect(Button).to.be.ok
+     })
+     it('可以设置icon.', () => {
+         const Constructor = Vue.extend(Button)
+         const vm = new Constructor({
+         propsData: {
+             icon: 'settings'
+         }
+         }).$mount()
+         const useElement = vm.$el.querySelector('use')
+         expect(useElement.getAttribute('xlink:href')).to.equal('#i-settings')
+         vm.$destroy()
+     })
+     it('可以设置loading.', () => {
+         const Constructor = Vue.extend(Button)
+         const vm = new Constructor({
+         propsData: {
+             icon: 'settings',
+             loading: true
+         }
+         }).$mount()
+         const useElements = vm.$el.querySelectorAll('use')
+         expect(useElements.length).to.equal(1)
+         expect(useElements[0].getAttribute('xlink:href')).to.equal('#i-loading')
+         vm.$destroy()
+     })
+     it('icon 默认的 order 是 1', () => {
+         const div = document.createElement('div')
+         document.body.appendChild(div)
+         const Constructor = Vue.extend(Button)
+         const vm = new Constructor({
+         propsData: {
+             icon: 'settings',
+         }
+         }).$mount(div)
+         const icon = vm.$el.querySelector('svg')
+         expect(getComputedStyle(icon).order).to.eq('1')
+         vm.$el.remove()
+         vm.$destroy()
+     })
+     it('设置 iconPosition 可以改变 order', () => {
+         const div = document.createElement('div')
+         document.body.appendChild(div)
+         const Constructor = Vue.extend(Button)
+         const vm = new Constructor({
+         propsData: {
+             icon: 'settings',
+             iconPosition: 'right'
+         }
+         }).$mount(div)
+         const icon = vm.$el.querySelector('svg')
+         expect(getComputedStyle(icon).order).to.eq('2')
+         vm.$el.remove()
+         vm.$destroy()
+     })
+     it('点击 button 触发 click 事件', () => {
+         const Constructor = Vue.extend(Button)
+         const vm = new Constructor({
+         propsData: {
+             icon: 'settings',
+         }
+         }).$mount()
+
+         const callback = sinon.fake();
+         vm.$on('click', callback)
+         vm.$el.click()
+         expect(callback).to.have.been.called
+
+     })
+ })
+```
+* (4)创建测试脚本,在 package.json 里面找到 scripts 并改写 scripts,内容如下：
+```
+ "scripts": {
+     "dev-test": "parcel watch test/* --no-cache & karma start",
+     "test": "parcel build test/* --no-minify && karma start --single-run"
+ },
+```
+* 这里的[parcel build](https://zh.parceljs.org/cli.html#%E6%9E%84%E5%BB%BA%EF%BC%88build%EF%BC%89),build 命令会一次性构建资源,也就是打包构建代码。
+* (5)运行测试脚本,
+   1. 要么使用 `npm run test` 一次性运行。
+      * 当运行这行命令的时候它会去把js打包，然后打开一个Chrome浏览器（当在karma.conf.js设置browsers: ['Chrome']，如果设置为browsers: ['ChromeHeadless']）,就不会打开Chrome，因为是无头浏览器，也就是浏览器被隐藏了。），然后再Chrome浏览器中运行网页，运行完后就自动关闭浏览器，然后把浏览器的输出显示在git-bash里面。
+      * 直接运行这个命令是会报错的。之前是从app.js引入的（app里面全局注册了icon），现在是test目录下面button.test.js里面引入（button.test.js没有全局注册icon）。有用到'/src/button'这个目录下面的icon标签。还需要在'/src/button'里面引入'/src/icon'和Vue（这里用全局注册虽然不建议用，但是可以解决这个报错），也就是在button里面全局注册了icon。
+      ```
+          import Vue from 'vue'
+          import Icon from './icon'
+          Vue.component('g-icon',Icon)
+      ```
+      * 如果还有component of undefined的报错，**这可能是打包的时候会有一些残渣（缓存.cache和原来的dist目录文件）就还需要把dist目录和.cache目录删除掉**。可以通过命令删除掉
+      ```
+      rm -rf .cache dist
+      ```
+      * 我的代码跟老师代码有一个地方有一点区别，**就是loadings: true，老师的代码是loading: true。我是为了区分loading和loadings**。
+      ```
+          it('可以设置loading.', () => {
+              const Constructor = Vue.extend(Button)
+              const vm = new Constructor({
+                  propsData: {
+                      icon: 'settings',
+                      loadings: true
+                  }
+              }).$mount()
+              const useElements = vm.$el.querySelectorAll('use')
+              expect(useElements.length).to.equal(1)
+              expect(useElements[0].getAttribute('xlink:href')).to.equal('#i-loading')
+              vm.$destroy()
+          })
+      ```
+      * 再次运行npm run test就可以看到6个成功的success
+      * 前面的全局注册不太建议，这里建议用局部注册。
+      ```
+          import Icon from './icon'
+          export default {
+              components:{
+                'g-button':Icon  
+              }
+          }
+      ```
+      * 再次删除掉dist目录和.cache目录,运行npm run test继续显示6个成功。
+      * **不需要每次都删除掉目录dist和.cache,只需要在脚本哪里增加--no-cache,也就是不要缓存，每次都是重新打包**。
+      ```
+       "scripts": {
+           "dev-test": "parcel watch test/* --no-cache & karma start",
+           "test": "parcel build test/* --no-cache --no-minify && karma start --single-run"
+       },
+      ```
+      * 当我们运行`npm run test`命令的时候，其实就是运行package.json里面的scripts里面的test对应的命令。也就是下面这个
+      ```
+             "scripts": {
+                 "test": "parcel build test/* --no-cache --no-minify && karma start --single-run"
+             },
+      ```
+      * `parcel build test/*`是重构打包test里面的所有一级文件，`--no-cache`是不要缓存，`--no-minify`是不要压缩（这是因为如果压缩了会把slot删除掉）
+         * 我们单独运行`parcel build test/* --no-cache --no-minify`也是可以实现的，因为我们不是全局安装，所以前面要加上npx。
+         ```
+         npx parcel build test/* --no-cache --no-minify
+         ```
+         * 打包test目录下面的文件(也就是button.test.js)之后会生成三个下面的文件（dist\button.test.js.map，dist\button.test.js ，dist\button.test.css）
+         ```
+         $ npx parcel build test/* --no-cache --no-minify
+         √  Built in 1.63s.
+         
+         dist\button.test.js.map    103.45 KB     10ms
+         dist\button.test.js        100.21 KB    1.44s
+         dist\button.test.css           978 B    944ms
+         ```
+         * **另外这里有一个小知识，就是想要把git bash上面的光标移动到最左边或者最右边在window系统中用Home和End键，如果是Mac系统就按cmd+左键和右键，还可以按ctrl+A和E键**。
+         * **为什么需要用parcel build来重构打包代码，因为我们用了import的一些浏览器不认识的语法**，比如`import Vue from 'vue'`对于浏览器来说是不认识的，需要转换为浏览器认识（至少目前不认识，未来认识与否需要未来再说）的代码。这就是重构打包的目的。这里打包后的代码会有三个作用：
+            1. 把Vue.js的源代码拷贝进来。
+            2. 把Vue做成一个变量提供给其他代码使用。
+         * test/button.test.js一共有79行代码，转换为dist/button.test.js之后就增加了特别多行的代码啦。
+      * 接下是`karma start --single-run`,它的意思是启动karma（karma start），然后只运行一次（--single-run）。这个karma怎么启动？就需要查看一个文件——karma.conf.js（它是karma配置js文件）
+         * 我们进来可以看到下面代码,他是测试代码，**也就是经过parcel built打包之后的代码**
+         ```
+                 // list of files / patterns to load in the browser
+                 files: [
+                     'dist/**/*.test.js',
+                     'dist/**/*.test.css'
+                 ],
+         ```
+         * 这里用到`dist/**/*`，也就是加载dist目录下面的所有级的文件，如果只写一个*,比如`dist/*`,那么只会加载dist目录下面的一级文件而不是所有级（包括三级，四级等等）的文件。
+         * 这里还会用到`'dist/**/*.test.css'`，是因为测试的时候还用到了order，这个属性是CSS属性。这个dist目录下面的test.css文件是从parcel built重构打包src目录里面的代码而来的。
+         * 代码中是由test目录下面的button.test.js里面有引入button.vue`import Button from '../src/button'`，而button.vue里面有CSS。
+         * 然后还有一行关于要打开哪个浏览器，browsers: ['ChromeHeadless'],代表无头（也就是隐藏Chrome浏览器窗口）的Chrome浏览器，browsers: ['Chrome']就代表Chrome浏览器，它不会隐藏Chrome浏览器窗口。
+         ```
+                 // start these browsers
+                 // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+                 browsers: ['ChromeHeadless'],
+         ```
+         * 如果你想在Edge和IE浏览器上测试需要安装插件，比如`npm i -D karma-ie-launcher`，或者`npm i -D karma-edge-launcher`，在IE上运行还需要在package.json里面增加下面代码，具体说明见[链接](https://stackoverflow.com/questions/22076660/cannot-load-ie-it-is-not-registered)
+         ```
+           "plugins": {
+             "karma-ie-launcher": "^1.0.0"//后面的版本号根据实际情况写。
+             }
+         ```
+         * IE浏览器很多API不是很支持，所以在我的电脑和IE11版本上测试出现报错
+         ```
+         IE 11.0.0 (Windows 10.0.0) ERROR
+           对象不支持“assign”属性或方法
+         ```
+   2. 要么使用 `npm run dev-test` 进行 watch 运行(这个后面再说)
+#### button.test.js这个测试用例的代码的分析
+* 这是一个**自动**单元测试代码，它跟前面的代码很相似，它有两个主要特点：
+1. button.test.js里面都用到了大括号把每个作用域分开，叫做作用域隔离，这样可使得变量命名一样的情况也不会冲突。
+2. 并且里面还存在断言代码。
+* 该代码用到describe...it...,it后面的第一个参数是名字，后面是这个名字的测试用例函数代码（用来实现你的描述describe），**这里的作用域隔离是通过函数隔离**。前面可以通过注释或者字符串（比如'可以设置icon'）写上该段代码的测试作用，比如下面的：
+```
+        '可以设置icon'
+    it('存在.', () => {//名字是存在，后面的是函数代码
+        expect(Button).to.be.ok//Button是存在的，不是undefined，null,0,'',NaN,不是一个falsy值
+    })
+```
+* 这种describe...it...也就是BDD（行为驱动开发），很符合自然语言，比如前面是描述什么它会怎么样，它属于[mocha库](https://mochajs.org/)，一般只需要建立一个test/test.js这种目录的文件即可。代码比如
+```
+describe '小狗'
+it has a head//小狗有一个投
+it has two eyes//小狗有两只眼睛
+it can run//小狗可以跑
+it can die//小狗会死
+//这种就是行为描述
+```
+* 后面几个基本都是用到expect().to.equal(),就是期待什么等于什么。
+* 最后一个点击事件，前面用的是spy，这里用的是fake，其实是类似的。**因为我们没有办法从技术层面来说某个函数被调用**，引入多了一个**sinon库,用sinon.fake()就是可以知道某个函数被调用了**。
+* 如果没有用spy或者sinon来监听调用的函数，只是用一个普通函数，比如这样写
+```
+    it('点击 button 触发 click 事件', () => {
+        const Constructor = Vue.extend(Button)
+        const vm = new Constructor({
+            propsData: {
+                icon: 'settings',
+            }
+        }).$mount()
+
+        // const callback = sinon.fake();
+        const callback=function(){}
+        vm.$on('click', callback)
+        vm.$el.click()
+        expect(callback).to.have.been.called
+
+    })
+```
+* 就会报出下面的错误
+```
+ TypeError: [Function: callback] is not a spy or a call to a spy!
+ //这个函数不是一个间谍函数，或者被调用的间谍函数
+```
+* 最后一个点击事件间谍函数如果没有触发点击事件，报错就会显示
+```
+AssertionError: expected fake to have been called at least once, but it was never called
+//断言错误，你期待的fake这个回调函数至少被调用依次，但是它从来没有被调用过
+```
+#### 测试用例的更多断言代码的介绍
+* 一般用的最多的就是expect(xxx)to.equal(yyy),意思就是期待xxx等于yyy。
+```
+expect(xxx)to.equal(yyy)
+```
+* equal可以简写为eq，比如
+```
+expect(xxx)to.eq(yyy)
+```
+* 比如期待xxx是数组，可以写成
+```
+expect(xxx instanceof Array)to.eq(true)
+```
+* 更多语句可以从[chai.js库](https://www.chaijs.com/)中查询.里面还有更多的API，可以查看[API](https://www.chaijs.com/api/bdd/)列举几个，比如
+1. [property](https://www.chaijs.com/api/bdd/#method_property)——属性
+2. [lengthOf](https://www.chaijs.com/api/bdd/#method_lengthof)——长度
+3. with——而且。他是连词（chains）
+4. [not](https://www.chaijs.com/api/bdd/#method_not)——否定的断言
+5. [deep](https://www.chaijs.com/api/bdd/#method_deep)——深相等，这个跟[深拷贝](https://zhuanlan.zhihu.com/p/59835538)类似，**一般深拷贝就是赋值操作（内容相等），浅拷贝是对象的内容相等，但是地址不同**。
+   * 比如
+   ```
+   expect([1,2]).to.deep.equal([1,2])//这个不会报错，这个只是内容相同即可。
+   expect([1,2]).to.equal([1,2])//这个会报错,因为虽然内容相同，但是地址不相同
+   ```
+6. [own](https://www.chaijs.com/api/bdd/#method_own)——不是原型链上继承的内容。而是自己拥有的。
+7. [NaN](https://www.chaijs.com/api/bdd/#method_nan)——因为在JS代码里面NaN不等于NaN，所以通过这个可以测试得到有一个NaN
+   * 比如
+   ```
+           expect(NaN).to.be.equal(NaN)//这个会报错
+           expect(NaN).to.be.NaN//这个没问题
+   ```
+8. [exist](https://www.chaijs.com/api/bdd/#method_exist)——断言什么是存在的。它跟[ok](https://www.chaijs.com/api/bdd/#method_ok)很像
+* 一些连词（Chains）是没有意义的，比如：我们用到的to,be,is等等，它们删除掉也不影响测试。它只是为了让你的自然语法变得好读好看而已。
+
+#### 小结
+* 小结如下：
+1. 首先package.jason需要写上test命令。
+2. karma.conf.js需要载入dist目录下的JS和CSS，然后指定浏览器
+3. 最后你的测试用例button.test.js需要用it隔开，每个测试用例的内容大概就是写一个断言，能否预期你的代码走向，你的代码行为。
+4. 测试用例的更多断言代码的介绍
+### 如何每次修改代码后不用手动运行npm run test，用到TravisCI
+* 也就是在`npm run dev-test`,他是开发的时候测试，也可以叫做watch-test,在package.json里面对应的是**[parcel watch](https://zh.parceljs.org/cli.html#%E7%9B%91%E5%90%AC%EF%BC%88watch%EF%BC%89)**,[当文件改变它仍然会自动重新构建并支持热替换，但是不会启动 web 服务](https://parceljs.org/getting_started.html)。
+* 后面是karma start，没有加上--single-run，说明不是运行一次，而是一直运行着。
+```
+  "scripts": {
+    "dev-test": "parcel watch test/* --no-cache & karma start",
+  },
+```
+   * **Windows 用户运行 npm run dev-test 时会出现 BUG**，貌似是因为 Windows 不支持 && 符号，更多说明见[使用 Karma + Mocha做单元测试](https://www.cnblogs.com/gitnull/p/10129149.html)解决办法是：
+      * 将 dev-test 对应的命令 `parcel watch test/* --no-cache & karma start` 分别运行，运行方式如下
+      1.新开一个 Git Bash 窗口运行 `npx parcel watch test/* --no-cache`
+      2.再开一个 Git Bash 窗口运行 `npx karma start`
+* 现在只需要**运行一次命令**，如果修改了测试用例或者src目录下面的代码，会自动编译并且测试用例，**不用再次运行命令了**。
+* 我们还可以把运行的这一次命令可省略掉，就是什么命令都不运行就自动测试。要用到[TravisCI]()。[阮一峰关于TravisCI的教程](http://www.ruanyifeng.com/blog/2017/12/travis_ci_tutorial.html)，还有一个叫做[CircleCI](https://circleci.com/)。
+* 一般来说github喜欢用TravisCI,因为它没有数量限制。
+* CircleCI功能更强大，但是它有数量限制。一次只能运行一个项目，如果有多个就需要交钱。
+* 所以我们就用TravisCI。
+
+
+
 
 
 * 除了单元测试，还有[E2E测试](https://blog.csdn.net/qq_39300332/article/details/81197503),不过这是在大型需求中**关键步骤才用到，比如下单**等。
@@ -1131,6 +1549,7 @@ const expect=chai.expect
 * [el](https://cn.vuejs.org/v2/api/#el)
 * [Vue子组件与父组件(看了就会)](https://blog.csdn.net/HaiJun_Aion/article/details/84801370)
 * [Vue中到底是什么是父组件，什么是子组件？](http://www.imooc.com/wenda/detail/480094)
+* 关于[try、catch、finally用法总结（二）](https://www.cnblogs.com/oldthree3/p/9270541.html)
 ## 其他说明
 * 一个Vue的UI组件。
 * 使用本框架前，请在CSS中开启下面代码

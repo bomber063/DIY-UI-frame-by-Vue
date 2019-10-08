@@ -52,7 +52,7 @@ try {
         const vm = new Constructor({
             propsData: {
                 icon: 'setting',
-                loadings: false
+                loadings: true
             }
         })
         vm.$mount()
