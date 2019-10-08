@@ -1330,7 +1330,7 @@ npm i -D karma karma-chrome-launcher karma-mocha karma-sinon-chai mocha sinon si
 * 这里的[parcel build](https://zh.parceljs.org/cli.html#%E6%9E%84%E5%BB%BA%EF%BC%88build%EF%BC%89),build 命令会一次性构建资源,也就是打包构建代码。
 * (5)运行测试脚本,
    1. 要么使用 `npm run test` 一次性运行。
-      * 当运行这行命令的时候它会去把js打包，然后打开一个Chrome浏览器（当在karma.conf.js设置browsers: ['Chrome']，如果设置为browsers: ['ChromeHeadless']）,就不会打开Chrome，因为是无头浏览器，也就是浏览器被隐藏了。），然后再Chrome浏览器中运行网页，运行完后就自动关闭浏览器，然后把浏览器的输出显示在git-bash里面。
+      * 当运行这行命令的时候它会去把js打包，然后打开一个Chrome浏览器（当在karma.conf.js设置browsers: ['Chrome']，如果设置为browsers: ['ChromeHeadless']）,就不会打开Chrome，因为是无头浏览器（浏览器的界面就是头），也就是浏览器被隐藏了。），然后再Chrome浏览器中运行网页，运行完后就自动关闭浏览器，然后把浏览器的输出显示在git-bash里面。
       * 直接运行这个命令是会报错的。之前是从app.js引入的（app里面全局注册了icon），现在是test目录下面button.test.js里面引入（button.test.js没有全局注册icon）。有用到'/src/button'这个目录下面的icon标签。还需要在'/src/button'里面引入'/src/icon'和Vue（这里用全局注册虽然不建议用，但是可以解决这个报错），也就是在button里面全局注册了icon。
       ```
           import Vue from 'vue'
@@ -1544,9 +1544,9 @@ node_js:
   - "8"//这里的是node.js的什么版本，这里是版本8,也可以支持多个版本
   - "9"
   - "10"
-addons:
+addons://插件，因为我们要用到chorme浏览器，下面的stable是代表稳定版本，一般稳定版是用的最多的人的版本
   chrome: stable
-sudo: required
+sudo: required//下面的代码加上就不会报错，具体做什么的暂时还不清楚，后续可以Google去搜索（可能因为parcel在压缩的时候把slot这个标签删除掉引起的）
 before_script:
   - "sudo chown root /opt/google/chrome/chrome-sandbox"
   - "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
@@ -1559,6 +1559,45 @@ before_script:
         // browsers:['Chrome'],//这个会报错
 ```
 * 如果你第一次报错，比如设置的是browsers:['Chrome'],那么修改为browsers: ['ChromeHeadless']后上传到git hub，TravisCI会**自动再次测试**，**你可以直接看运行结果，你也可以到你的邮箱里面查看运行的结果是否成功**。
+* 以上就是持续集成的一部分——持续测试，除此之外还有持续交付和持续部署等。就是所有的东西可以走可持续的操作可持续的各种操作。中间不要断开。
+## 让自己的这些代码发布给所有其他用户使用
+* 首先要确保自己的代码测试通过，我们可以查看Vue.js代码的测试记过，进入[Vue.js的git hub](https://github.com/vuejs/vue),我们点击passing,就可以进入到Vue.js的[测试界面](https://circleci.com/gh/vuejs/vue/tree/dev),可以看到他是用circleCI来测试做的。并且在Vue.js的test目录下面可以看到测试代码。通过该它的[package.json](https://github.com/vuejs/vue/blob/dev/package.json)看到它用的是jasmine这个插件做测试。你还可以查看react和Angular的测试信息。
+* 然后确保你的代码上传到了[npmjs.org](https://www.npmjs.com/)
+
+
+   1. 在上传之前你需要把你的package.json的版本号修改成0.0.1，因为默认的一般是1.0.0，如果是1.0.0说明整个框架写完了，但是目前还没有写完。
+   ```
+     "version": "0.0.1",
+   ```
+   2. 创建 index.js，在 index.js 里将你想要导出的内容全部导出，作为一个入口，需要引入三个组件Button,ButtonGroup,Icon，然后用export导出三个变量供其他有import的使用。**import和export配套使用**
+   ```
+   import Button from './src/button.vue'
+   import ButtonGroup from './src/button-grounp'
+   import Icon from './src/icon'
+   
+   export {Button,ButtonGroup,Icon}
+   ```
+   3. 然后注意一下你的package.json里面有这样的一个入口代码描述，一般默认有加
+   ```
+     "main": "index.js",
+   ```
+   4. 去 [https://www.npmjs.com/](https://www.npmjs.com/) 注册一个账户
+   5. 确认一下邮箱（**必须**）
+   6. 在本项目根目录运行 npm adduser（在git bash里面输入）,这里注意的一下如果错误提示里面含有 https://registry.npm.taobao.org 则说明你的 npm 源目前为淘宝源，需要更换为 npm 官方源，taobao源对于大陆用户下载速度比较快。输入
+      ```
+         npm config list
+      ```
+      * 就可以查看到; userconfig C:\Users\bomber\.npmrc这个目录下面把该注释掉就好了。
+      ```
+      //registry=http://registry.npm.taobao.org/
+      ```
+      * 出现Logged in as bomber（这里是你的名字） on，就代表成功了(**我发现我是window用户，在大陆没有更换taobao源也没有报错**)
+   7. 如果错误提示里面含有 https://registry.npm.taobao.org 则说明你的 npm 源目前为淘宝源，需要更换为 npm 官方源
+      运行 npm publish（由于我的这框架还有一些问题，所以把package.json里面的名字name修改为gulu-bomber-2019108,这样就没有人会去搜这个名字了，怕出丑）
+      ```
+        "name": "gulu-bomber-2019108",
+      ```
+
 
 
 
