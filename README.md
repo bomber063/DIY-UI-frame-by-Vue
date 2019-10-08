@@ -1619,7 +1619,7 @@ before_script:
    ```
 * 其实不需要上传所有代码，有些没有用的代码可以废弃掉，这个后面在说。
 * 完成之后可以把taobao源设置回来，不然你下载安装其他东西的时候速度会比较慢（除非你用的是[cnpm](https://www.jianshu.com/p/115594f64b41)）。
-### 使用自己的包
+### 模拟别人使用自己的包
 * 预测其他使用你的包的人会怎么使用(理论上下面三种都要测试，但是我这里只测试vue-cli)
    1. 使用 vue-cli(这里以这个为基础来说明)
       * 一般用户会去的搜索[vue-cli官网](https://cli.vuejs.org/guide/installation.html)如何安装
@@ -1641,7 +1641,7 @@ before_script:
       ```
       import {Button,ButtonGroup,Icon} from 'gulu-bomber-1-1'
       
-      Window.console.log(Button)
+      window.console.log(Button)
       ```
       * 只需要用parcel build一下就可以把import代码编程node可以认识的代码了
       ```
@@ -1661,8 +1661,31 @@ before_script:
       ```
       * 所以重新发布的时候要修改版本
       ```
-      
+        "version": "0.0.2",
       ```
+      * 再次`npm npm publish`就会显示你的版本
+      ```
+      + gulu-bomber-1-1@0.0.2
+      ```
+      * 然后用户就会去更新你的0.0.2版本，我是window用户，直接运行下面的两个命令都不能更新到最新版本
+      ```
+      npm update gulu-bomber-1-1
+      npm i gulu-bomber-1-1
+      ```
+      * 所以我只有删除了原来的的0.0.1版本
+      ```
+      npm unupdate gulu-bomber-1-1
+      ```
+      * 然后再次运行安装，就自动找到0.0.2最新版本了
+      ```
+      npm i gulu-bomber-1-1
+      ```
+      * 如果你知道版本号，可以不用删除，而是直接运行下面的
+      ```
+      npm i gulu-bomber-1-1@0.0.2
+      ```
+      * 因为我自己把import的目录写错了，所以又升版到0.0.3了
+      
    2. 使用 webpack
    3. 使用 parcel
 * 分别使用这些方式来使用自己的包（我们只以 vue-cli 为例）
