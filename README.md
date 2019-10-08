@@ -1539,9 +1539,11 @@ expect(xxx instanceof Array)to.eq(true)
    * 所以我们就用TravisCI。
 * 首先新建一个文件名字叫做.travis.yml。内容如下：
 ```
-language: node_js
+language: node_js//这里意思是说用的node.js语言，因为我们测试的时候跑的是npm,npm是node.js给的
 node_js:
-  - "8"
+  - "8"//这里的是node.js的什么版本，这里是版本8,也可以支持多个版本
+  - "9"
+  - "10"
 addons:
   chrome: stable
 sudo: required
@@ -1550,6 +1552,13 @@ before_script:
   - "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
 ```
 * 然后在TravisCI上注册一个账号，**可以用git hub账号登陆**。然后找到你git hub远程仓库里面需要自动监听的代码仓库名。然后把×点下换成√。
+* 然后把本地的travis.yml文件上传到远程仓库，就可以在TravisCI首页看到自动运行监听和测试实例了。
+* 如果你的karma.conf.js里面的浏览器配置没有写无头（Headless），就会报错
+```
+        browsers: ['ChromeHeadless'],//这个可以正常运行
+        // browsers:['Chrome'],//这个会报错
+```
+* 如果你第一次报错，比如设置的是browsers:['Chrome'],那么修改为browsers: ['ChromeHeadless']后上传到git hub，TravisCI会**自动再次测试**，**你可以直接看运行结果，你也可以到你的邮箱里面查看运行的结果是否成功**。
 
 
 
