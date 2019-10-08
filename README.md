@@ -1651,7 +1651,15 @@ before_script:
       ```
         "main": "dist/index.js",
       ```
-      * 然后需要**再次发布**
+      * 然后需要**再次发布，发布的时候需要删除或者注释掉taobao源**，
+      ```
+      npm publish
+      ```
+      * 如果是你不修改版本也是会报错的，报错如下
+      ```
+      npm ERR! You cannot publish over the previously published versions: 0.0.1. : gulu-bomber-1-1
+      ```
+      * 所以重新发布的时候要修改版本
       ```
       
       ```
