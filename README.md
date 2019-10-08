@@ -1530,18 +1530,30 @@ expect(xxx instanceof Array)to.eq(true)
 ```
    * **Windows 用户运行 npm run dev-test 时会出现 BUG**，貌似是因为 Windows 不支持 && 符号，更多说明见[使用 Karma + Mocha做单元测试](https://www.cnblogs.com/gitnull/p/10129149.html)解决办法是：
       * 将 dev-test 对应的命令 `parcel watch test/* --no-cache & karma start` 分别运行，运行方式如下
-      1.新开一个 Git Bash 窗口运行 `npx parcel watch test/* --no-cache`
-      2.再开一个 Git Bash 窗口运行 `npx karma start`
+      1. 新开一个 Git Bash 窗口运行 `npx parcel watch test/* --no-cache`
+      2. 再开一个 Git Bash 窗口运行 `npx karma start`
 * 现在只需要**运行一次命令**，如果修改了测试用例或者src目录下面的代码，会自动编译并且测试用例，**不用再次运行命令了**。
 * 我们还可以把运行的这一次命令可省略掉，就是什么命令都不运行就自动测试。要用到[TravisCI]()。[阮一峰关于TravisCI的教程](http://www.ruanyifeng.com/blog/2017/12/travis_ci_tutorial.html)，还有一个叫做[CircleCI](https://circleci.com/)。
-* 一般来说github喜欢用TravisCI,因为它没有数量限制。
-* CircleCI功能更强大，但是它有数量限制。一次只能运行一个项目，如果有多个就需要交钱。
-* 所以我们就用TravisCI。
+   * 一般来说github喜欢用TravisCI,因为它没有数量限制。
+   * CircleCI功能更强大，但是它有数量限制。一次只能运行一个项目，如果有多个就需要交钱。
+   * 所以我们就用TravisCI。
+* 首先新建一个文件名字叫做.travis.yml。内容如下：
+```
+language: node_js
+node_js:
+  - "8"
+addons:
+  chrome: stable
+sudo: required
+before_script:
+  - "sudo chown root /opt/google/chrome/chrome-sandbox"
+  - "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
+```
+* 然后在TravisCI上注册一个账号，**可以用git hub账号登陆**。然后找到你git hub远程仓库里面需要自动监听的代码仓库名。然后把×点下换成√。
 
 
 
-
-
+## 其他参考学习链接
 * 除了单元测试，还有[E2E测试](https://blog.csdn.net/qq_39300332/article/details/81197503),不过这是在大型需求中**关键步骤才用到，比如下单**等。
 
 * [vue之父子组件间通信实例讲解(props、ref、emit)](https://www.cnblogs.com/myfate/p/10965944.html)
