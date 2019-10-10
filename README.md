@@ -1624,7 +1624,7 @@ before_script:
    1. 使用 vue-cli(这里以这个为基础来说明)
       * 一般用户会去的搜索[vue-cli官网](https://cli.vuejs.org/guide/installation.html)如何安装
       ```
-      npm install -g @vue/cli
+      npm install @vue/cli
       ```
       * 然后根据[vue-create](https://cli.vuejs.org/guide/creating-a-project.html#vue-create)创建项目
       * 记住如果前面使用的是npm，那么vue-cli也要安装配置的时候选择npm才可以，如果选择yarn会报错。
@@ -1643,7 +1643,7 @@ before_script:
       
       window.console.log(Button)
       ```
-      * 只需要用parcel build一下就可以把import代码编程node可以认识的代码了
+      * 只需要用parcel build一下就可以把import代码编程node可以认识的代码了（**这里一定要加--no-minify，不然可能会忽略掉slot标签，反正就是有bug，这个bug就是你的button标签里面的字是不显示的**）
       ```
       npx parcel build index.js --no-minify
       ```
@@ -1685,22 +1685,95 @@ before_script:
       npm i gulu-bomber-1-1@0.0.2
       ```
       * 因为我自己把import的目录写错了，所以又升版到0.0.3了
-      
-   2. 使用 webpack
-   3. 使用 parcel
+      * 我们在下载好的app.vue文件里面增加下面的代码就可以看到button了
+      ```
+      <template>
+        <div id="app">
+          <g-button>欢迎</g-button>
+        </div>
+      </template>
+      import {Button,ButtonGroup,Icon} from 'gulu-bomber-1-1'
+      export default {
+        name: 'app',
+        components: {
+          HelloWorld,
+          'g-button':Button
+        }
+      }
+      ```
+* 最后需要加上CSS样式。这里只需要提醒用户手动引入这个CSS即可，他是在dist目录下面的后缀为CSS的文件，所以就在App.vue文件里面增加CSS的路径
+```
+import 'gulu-bomber-1-1/dist/index.css'
+```
+* 但是加上之后发现边框没了，那是因为我们用的CSS是变量。所以要给变量赋值。所以需要提醒用户手动加上默认的变量信息，可以放到App.vue的style标签里面：
+```
+        :root{
+            --button-height:32px;
+            --font-size:14px;
+            --button-bg:white;
+            --button-active-bg:#eee;
+            --border-radius:4px;
+            --color:#333;
+            --border-color:#999;
+            /*--border-color-hover:#666;*/
+            --border-color-hover:#666;
+        }
+        body{
+            font-size:var(--font-size);
+        }
+```      
+   2. 使用 webpack(暂时不分析)
+   3. 使用 parcel(暂时不分析)
 * 分别使用这些方式来使用自己的包（我们只以 vue-cli 为例）
-   1. 使用过程中我们发现报错说 import 语法有问题，那时因为 node 目前确实不支持 import，我们需要用 babel 转译 import
+   *. 使用过程中我们发现报错说 import 语法有问题，那时因为 node 目前确实不支持 import，我们需要用 babel 转译 import
       1. 你可以要求使用者自己用 babel 来转译（这种方式不推荐，是写库写框架或者轮子给别人用的大忌）
       2. 你也可以转义好了再给他用
          * `npx parcel build index.js --no-minify` （本来不应该加 --no-minify 的，奈何不加会有 bug，HTML 压缩把 slot 标签全删了）
          * 将 package.json 的 main 改为 dist/index.js
-   2. 使用 npm link 或者 yarn link 来加速调试
+#### 前面都是每次改一行代码都需要npm publish打包上传到npm，然后别人在下载，下面就可以省去这个步骤，不上传npm就可以测试   
+* 如何不用上传到npm就可以测试我们的代码是否存在bug。(也就是省略开发者npm publish，然后用户npm install这个过程)
+* 这个需要用到npm link，你把需要测试的项目目录下面运行npm link之后，就可以在本地本机（**注意一定要本机**）的另外一个文件夹下面运行
+```
+npm init -f
+```
+* 之后再运行
+```
+npm link gulu-bomber-1-1
+```
+* 就可以在本地测试了
+* 使用 npm link 或者 yarn link 来加速调试
       1. 你每次修改源码之后，有两条路让别人得到最新效果
          1. 更新 package.json 里的 version，然后 npm publish。别人通过 npm update xxx 来更新。
          2. 如果你只是为了本地调试，可以在项目目录使用 npm link，然后在使用之处运行 npm link xxx，就是最新了
-
-
-
+#### 需要注意npm link在window上运行可能会出错，在ios系统上面可以执行
+* 你在window上运行
+```
+npm link gulu-bomber-1-1
+```
+* 创建的是一个**快捷键（如果用npm publish和npm install就不是快捷键）**，并且报错
+```
+Module build failed (from ./node_modules/eslint-loader/index.js):
+```
+* 我们的开启的目录已经修改到了`dist/index.js`这里，但是还是运行在`index.js`目录，不知道为什么。如果是window用户建议还是用npm publish和npm install方法/
+##### 其他参考学习链接
+* [npm链接在Windows上不起作用？](https://stackoverflow.com/questions/34815260/npm-link-not-working-on-windows)
+* [npm link中文文档](https://www.cnblogs.com/pqjwyn/p/9626335.html)
+* [记一次错：Vue 构建项目后使用 npm link 失败](https://www.jianshu.com/p/ca252cd667df)
+* [npm link的使用](https://www.jianshu.com/p/aaa7db89a5b2?tdsourcetag=s_pcqq_aiomsg)
+## 总结
+1. 单文件组件（Vue）
+2. Parcel（打包）
+3. 单元测试（{...}{...}）
+4. 自动测试:
+   1. Karma——打开浏览器自动测试
+   2. Mocha——BDD，describe...it...
+   3. Chai_expect(xxx).to.eq(yyy)
+5. 持续集成:
+   1. TravisCi
+   2. Circle.CI
+6. 如何写package.json，了解如何写之后才能发布npm publish我们的npm包
+   1. 比如main:dist/index.js或者main:dist/index.js
+7. 用npm link或者yarn link加快造轮子的过程（这个在window系统上使用可能会有BUG）
 
 ## 其他参考学习链接
 * 除了单元测试，还有[E2E测试](https://blog.csdn.net/qq_39300332/article/details/81197503),不过这是在大型需求中**关键步骤才用到，比如下单**等。
