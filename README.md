@@ -422,7 +422,7 @@ v-bind:style="{order:iconPosition}"
         </button>
 ```
 2. 用 v-bind:class,用CSS来控制前后顺序，不用JS控制前后顺序，这样用CSS来做样式相关的代码，可以减少代码重复导致不小心的犯错,这里用到了[用方括号括起来的 JavaScript 表达式作为一个指令的参数](https://cn.vuejs.org/v2/guide/syntax.html#%E5%8A%A8%E6%80%81%E5%8F%82%E6%95%B0),比如下面的代码，这里的${iconPosition}首先会被props里面的icon-position替换，prop这里的icon-position是index中赋值的right，所以${iconPosition}最后就是right，所以就变成`{[`icon-right`]:true}`,
-icon-right会被作为一个 JavaScript 表达式进行动态求值，求得的值将会作为最终的参数来使用。那么这个绑定将等价于 v-bind:class={icon-right:true}。**这个 class 存在与否将取决于数据属性 icon-right 的 truthiness,默认是false，**也就是默认不绑定icon-right这个class,但是如果是true那么就会绑定icon-right这个class。具体见[对象语法](https://cn.vuejs.org/v2/guide/class-and-style.html#%E5%AF%B9%E8%B1%A1%E8%AF%AD%E6%B3%95)
+icon-right会被作为一个 JavaScript 表达式进行动态求值，求得的值将会作为最终的参数来使用。那么这个绑定将等价于 v-bind:class={icon-right:true}。**这个 class 存在与否将取决于数据属性 icon-right 的 truthiness,默认是false**，也就是默认不绑定icon-right这个class,但是如果是true那么就会绑定icon-right这个class。具体见[对象语法](https://cn.vuejs.org/v2/guide/class-and-style.html#%E5%AF%B9%E8%B1%A1%E8%AF%AD%E6%B3%95)
 ```
             <svg v-if="icon" class="icon" v-bind:class="{[`icon-${iconPosition}`]:true}" aria-hidden="true">
                 <use :xlink:href="`#i-${icon}`"></use>
