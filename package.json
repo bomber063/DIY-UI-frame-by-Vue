@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/bomber063/DIY-UI-frame-by-Vue#readme",
   "dependencies": {
+    "de-indent": "^1.0.2",
     "vue": "^2.6.10",
     "vue-hot-reload-api": "^2.3.4"
   },

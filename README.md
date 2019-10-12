@@ -1775,6 +1775,23 @@ Module build failed (from ./node_modules/eslint-loader/index.js):
    1. 比如main:dist/index.js或者main:dist/index.js
 7. 用npm link或者yarn link加快造轮子的过程（这个在window系统上使用可能会有BUG）
 
+## 最后解决一个BUG（因为增加了mocha库，但是并未完全下载它的全部依赖de-indent，再次运行parcel会报错）
+* 运行下面代码报错
+```
+npx parcel index.html --no-cache
+```
+* 报错信息如下:
+```
+×  Cannot find module 'de-indent'
+```
+* 所以需要安装de-indent依赖，可以直接安装,这种方式你的package.json会告诉你安装了什么。但是node_modules会增加100多MB的文件
+```
+npm i de-indent
+```
+* 也可以运行`npm i`，不过这种方式你的package.json不会告诉你安装了啥。同样node_modules会增加100多MB的文件。
+* **因为我的git hub仓库是忽略了node_modules的**，所以并没有记录这里面的变化，所以当时查询以往记录的时候没有查询到
+* 具体可以见[de-indent在git-hub上面的说明](https://github.com/yyx990803/de-indent)和[de-indent在npm的说明](https://www.npmjs.com/package/de-indent)
+
 ## 其他参考学习链接
 * 除了单元测试，还有[E2E测试](https://blog.csdn.net/qq_39300332/article/details/81197503),不过这是在大型需求中**关键步骤才用到，比如下单**等。
 
