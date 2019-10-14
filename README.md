@@ -1395,6 +1395,13 @@ npm i -D karma karma-chrome-launcher karma-mocha karma-sinon-chai mocha sinon si
          dist\button.test.js        100.21 KB    1.44s
          dist\button.test.css           978 B    944ms
          ```
+         * 之前用的`npx parcel index.html --no-cache`代码会生成一个dist文件，里面会存在一些内容，但是并不一定会支持所有浏览器，这时候你如果运行`npx parcel build index.html --no-minify`,也就是bulid一下，那么会新生成四个文件,这些文件是经过压缩转义而形成的，是发布上线代码前最好需要处理一下的命令，详细说明可以参考[npm常用技巧及parcel打包工具使用](https://zhuanlan.zhihu.com/p/44774513)
+         ```
+         dist\app.d6aa8548.js.map    646.88 KB     61ms
+         dist\app.d6aa8548.js        463.42 KB    2.60s
+         dist\index.html               1.66 KB    480ms
+         dist\app.a4233430.css         1.49 KB     27ms
+         ```
          * **另外这里有一个小知识，就是想要把git bash上面的光标移动到最左边或者最右边在window系统中用Home和End键，如果是Mac系统就按cmd+左键和右键，还可以按ctrl+A和E键**。
          * **为什么需要用parcel build来重构打包代码，因为我们用了import的一些浏览器不认识的语法**，比如`import Vue from 'vue'`对于浏览器来说是不认识的，需要转换为浏览器认识（至少目前不认识，未来认识与否需要未来再说）的代码。这就是重构打包的目的。这里打包后的代码会有三个作用：
             1. 把Vue.js的源代码拷贝进来。
@@ -1791,7 +1798,53 @@ npm i de-indent
 * 也可以运行`npm i`，不过这种方式你的package.json不会告诉你安装了啥。同样node_modules会增加100多MB的文件。
 * **因为我的git hub仓库是忽略了node_modules的**，所以并没有记录这里面的变化，所以当时查询以往记录的时候没有查询到
 * 具体可以见[de-indent在git-hub上面的说明](https://github.com/yyx990803/de-indent)和[de-indent在npm的说明](https://www.npmjs.com/package/de-indent)
+* 可以用的git 命令
+```
+git reset --hard 后面加commit的代码
+//直接还原到某个commit的代码
+```
+* 某个commit的代码可以通过下面的命令查看
+```
+git reflog
+```
+## 又出现了一个BUG，可能是因为我重新安装了Chrome浏览器导致的(解决了)
+* 可能是因为我重新安装了Chrome浏览器导致的，我想测试代码的时候运行npm run test后会报错如下：
+```
+$ npm run test
 
+> gulu-demo@1.0.0 test C:\Users\bomber\Desktop\gulu-demo
+> parcel build test/* --no-cache --no-minify && karma start --single-run
+
+√  Built in 1.87s.
+
+dist\button.test.js.map    103.73 KB      6ms
+dist\button.test.js        100.45 KB    1.67s
+dist\button.test.css           978 B    1.14s
+'karma' ▒▒▒▒▒ڲ▒▒▒▒ⲿ▒▒▒Ҳ▒▒▒ǿ▒▒▒▒еĳ▒▒▒
+▒▒▒▒▒▒▒▒▒ļ▒▒▒
+npm ERR! code ELIFECYCLE
+npm ERR! errno 1
+npm ERR! gulu-demo@1.0.0 test: `parcel build test/* --no-cache --no-minify && karma start--single-run`
+npm ERR! Exit status 1
+npm ERR!
+npm ERR! Failed at the gulu-demo@1.0.0 test script.
+npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     C:\Users\bomber\AppData\Roaming\npm-cache\_logs\2019-10-14T17_00_44_715Z-debug.log
+```
+* 命令npm run test是两句代码的缩写，也就是`parcel build test/* --no-cache --no-minify && karma start --single-run`，所以分开来写发现运行`parcel build test/* --no-cache --no-minify `是没有问题的，但是运行`npx karma start --single-run`发现报错如下：
+```
+15 10 2019 01:33:09.987:ERROR [karma-server]: Server start failed on port 9876: Error: Noprovider for "framework:mocha"! (Resolving: framework:mocha)
+```
+* 最后找了半天不知道为什么，我自己把测试用的依赖全部卸载，也就是
+```
+npm unistall -D karma karma-chrome-launcher karma-mocha karma-sinon-chai mocha sinon sinon-chai karma-chai karma-chai-spies
+```
+* 然后全部重新安装一遍就解决这个BUG了
+```
+npm i -D karma karma-chrome-launcher karma-mocha karma-sinon-chai mocha sinon sinon-chai karma-chai karma-chai-spies
+```
 ## 其他参考学习链接
 * 除了单元测试，还有[E2E测试](https://blog.csdn.net/qq_39300332/article/details/81197503),不过这是在大型需求中**关键步骤才用到，比如下单**等。
 
