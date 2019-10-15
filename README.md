@@ -1839,7 +1839,7 @@ npm ERR!     C:\Users\bomber\AppData\Roaming\npm-cache\_logs\2019-10-14T17_00_44
 ```
 * 最后找了半天不知道为什么，我自己把测试用的依赖全部卸载，也就是
 ```
-npm unistall -D karma karma-chrome-launcher karma-mocha karma-sinon-chai mocha sinon sinon-chai karma-chai karma-chai-spies
+npm uninstall -D karma karma-chrome-launcher karma-mocha karma-sinon-chai mocha sinon sinon-chai karma-chai karma-chai-spies
 ```
 * 然后全部重新安装一遍就解决这个BUG了
 ```
