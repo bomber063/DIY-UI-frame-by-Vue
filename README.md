@@ -257,7 +257,7 @@ new Vue({
     el: '#app',
 })
 ```
-* 最后我们需要运行parcel打包代码运行后才可以生效。**需要写入完整路径,window用户还需要在后面加上index.html，不然可能会有No entres found 报错**。
+* 最后我们需要运行parcel打包代码运行后才可以生效。**需要写入完整路径,window用户还需要在后面加上index.html，如果不加index.html，默认会去访问index.js这个入口，也就是可能会有No entres found 报错**。
 ```
 ./node_modules/.bin/parcel index.html
 ```
@@ -1800,13 +1800,14 @@ npm i de-indent
 * 具体可以见[de-indent在git-hub上面的说明](https://github.com/yyx990803/de-indent)和[de-indent在npm的说明](https://www.npmjs.com/package/de-indent)
 * 可以用的git 命令
 ```
-git reset --hard 后面加commit的代码
+git reset --hard 后面加commit的代码的ID
 //直接还原到某个commit的代码
 ```
 * 某个commit的代码可以通过下面的命令查看，git reflog对于已经删除也就是reset还原的记录也可以查询到，但是git log不可以查询已经还原的记录。
 ```
 git reflog
 ```
+* 找到你需要的记录之后你可以使用`git show 后面加commit的代码的ID`查看你修改了哪个地方。
 ## 又出现了一个BUG，可能是因为我重新安装了Chrome浏览器导致的(解决了)
 * 可能是因为我重新安装了Chrome浏览器导致的，我想测试代码的时候运行npm run test后会报错如下：
 ```
