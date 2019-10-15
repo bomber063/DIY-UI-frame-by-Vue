@@ -1845,6 +1845,8 @@ npm uninstall -D karma karma-chrome-launcher karma-mocha karma-sinon-chai mocha 
 ```
 npm i -D karma karma-chrome-launcher karma-mocha karma-sinon-chai mocha sinon sinon-chai karma-chai karma-chai-spies
 ```
+## 这里的icon的svg信息暂时还引入不了，因为我们用的是script链接，请在下面链接说明去解决
+* [SVG的icon引入方式修改](https://github.com/bomber063/DIY-UI-frame-by-Vue-for-input)
 ## 其他参考学习链接
 * 除了单元测试，还有[E2E测试](https://blog.csdn.net/qq_39300332/article/details/81197503),不过这是在大型需求中**关键步骤才用到，比如下单**等。
 
