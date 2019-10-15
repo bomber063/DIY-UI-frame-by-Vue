@@ -1803,7 +1803,7 @@ npm i de-indent
 git reset --hard 后面加commit的代码
 //直接还原到某个commit的代码
 ```
-* 某个commit的代码可以通过下面的命令查看
+* 某个commit的代码可以通过下面的命令查看，git reflog对于已经删除也就是reset还原的记录也可以查询到，但是git log不可以查询已经还原的记录。
 ```
 git reflog
 ```
