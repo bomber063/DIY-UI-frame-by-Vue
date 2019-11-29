@@ -67,6 +67,12 @@ npm i vue
 * 由于安装Vue之后会出现node_modules文件夹，里面有大量的文件，可以选择新建一个.gitignore来设置某个路径的文件并不提交到git hub仓库。
 #### 用webStorm操作后续代码
 * WebStorm的安装，见链接[JetBrains WebStorm 2019.1 x64 破解](http://www.bcniubi.cn/221)和链接[Webstorm 2019.1 破解](https://blog.csdn.net/fu983531588/article/details/89312799)
+***
+* **注意前面的破解的代码可能用不了了，目前我正在使用的是[Intellij Idea 2019.1安装破解（附安装包及注册码）](https://juejin.im/post/5d4eb2d8518825159e3d7a64)**,其他的链接：
+    * [IntelliJ IDEA/PyCharm/WebStorm 2019.1.2 注册码激活](https://www.cnblogs.com/julygift/p/7940928.html)
+    * 上面的都是可用到**2020年3月11日**。
+    * [适用的webstorm包18年1月版本](https://blog.csdn.net/xr510002594/article/details/81488461),这个是2018年1月版本的，我下载的是2019年1月版本所以暂时不匹配，等到期了在考虑吧。
+***
 * WebStorm的汉化见链接[webStorm安装及汉化教程](https://blog.csdn.net/qq_33915006/article/details/79696319)
 * WebStorm添加到鼠标右键的方法链接[WebStorm添加右键菜单](https://www.jianshu.com/p/de8f31e11dea)
 * WebStorm修改字体方法链接[WebStorm设置编辑器中的字体大小及样式](https://www.cnblogs.com/dzlishen/p/4253280.html)
